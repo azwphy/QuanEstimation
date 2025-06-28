@@ -14,12 +14,12 @@ class ComprehensiveSystem:
     Attributes
     ----------
     > **savefile:** `bool`
-        -- Whether or not to save all the optimized variables (probe states, 
-        control coefficients and measurements).  
-        If set `True` then the optimized variables and the values of the 
-        objective function obtained in all episodes will be saved during 
-        the training. If set `False` the optimized variables in the final 
-        episode and the values of the objective function in all episodes 
+        -- Whether or not to save all the optimized variables (probe states,
+        control coefficients and measurements).
+        If set `True` then the optimized variables and the values of the
+        objective function obtained in all episodes will be saved during
+        the training. If set `False` the optimized variables in the final
+        episode and the values of the objective function in all episodes
         will be saved.
 
     > **psi0:** `list of arrays`
@@ -39,59 +39,86 @@ class ComprehensiveSystem:
     """
 
     def __init__(self, savefile, psi0, ctrl0, measurement0, seed, eps):
-
         self.savefile = savefile
         self.ctrl0 = ctrl0
         self.psi0 = psi0
         self.eps = eps
         self.seed = seed
         self.measurement0 = measurement0
-        
+
     def load_save_ctrls(self, cnum, max_episode):
         if os.path.exists("controls.dat"):
-            fl = h5py.File("controls.dat",'r')
+            fl = h5py.File("controls.dat", "r")
             dset = fl["controls"]
             if self.savefile:
-                controls = np.array([[np.array(fl[fl[dset[i]][j]]) for j in range(cnum)] for i in range(max_episode)])
+                controls = np.array(
+                    [
+                        [np.array(fl[fl[dset[i]][j]]) for j in range(cnum)]
+                        for i in range(max_episode)
+                    ]
+                )
             else:
                 controls = np.array([np.array(fl[dset[j]]) for j in range(cnum)])
             np.save("controls", controls)
-        else: pass
-        
+        else:
+            pass
+
     def load_save_ctrls_alt(self, cnum, max_episode):
         if os.path.exists("controls.dat"):
-            fl = h5py.File("controls.dat",'r')
+            fl = h5py.File("controls.dat", "r")
             dset = fl["controls"]
             if self.savefile:
-                controls = np.array([[np.array(fl[fl[dset[i]][j]]) for j in range(cnum)] for i in range(max_episode)])
+                controls = np.array(
+                    [
+                        [np.array(fl[fl[dset[i]][j]]) for j in range(cnum)]
+                        for i in range(max_episode)
+                    ]
+                )
             else:
-                controls = np.array([dset[:,i] for i in range(cnum)])
+                controls = np.array([dset[:, i] for i in range(cnum)])
             np.save("controls", controls)
-        else: pass
-            
+        else:
+            pass
+
     def load_save_states(self, max_episode):
         if os.path.exists("states.dat"):
-            fl = h5py.File("states.dat",'r')
+            fl = h5py.File("states.dat", "r")
             dset = fl["states"]
             if self.savefile:
-                psi = np.array([np.array(fl[dset[i]]).view('complex') for i in range(max_episode)])
+                psi = np.array(
+                    [np.array(fl[dset[i]]).view("complex") for i in range(max_episode)]
+                )
             else:
-                psi = np.array(dset).view('complex')
+                psi = np.array(dset).view("complex")
             np.save("states", psi)
-        else: pass
-        
+        else:
+            pass
+
     def load_save_meas(self, mnum, max_episode):
         if os.path.exists("measurements.dat"):
-            fl = h5py.File("measurements.dat",'r')
+            fl = h5py.File("measurements.dat", "r")
             dset = fl["measurements"]
             if self.savefile:
-                mdata = np.array([[np.array(fl[fl[dset[i]][j]]).view('complex') for j in range(mnum)] for i in range(max_episode)])
+                mdata = np.array(
+                    [
+                        [
+                            np.array(fl[fl[dset[i]][j]]).view("complex")
+                            for j in range(mnum)
+                        ]
+                        for i in range(max_episode)
+                    ]
+                )
             else:
-                mdata = np.array([np.array(fl[dset[j]]).view('complex') for j in range(mnum)])
+                mdata = np.array(
+                    [np.array(fl[dset[j]]).view("complex") for j in range(mnum)]
+                )
             np.save("measurements", mdata)
-        else: pass
+        else:
+            pass
 
-    def dynamics(self, tspan, H0, dH, Hc=[], ctrl=[], decay=[], ctrl_bound=[], dyn_method="expm"):
+    def dynamics(
+        self, tspan, H0, dH, Hc=[], ctrl=[], decay=[], ctrl_bound=[], dyn_method="expm"
+    ):
         r"""
         The dynamics of a density matrix is of the form 
 
@@ -166,7 +193,9 @@ class ComprehensiveSystem:
             phi = 2 * np.pi * np.random.random(self.dim)
             psi = np.array([r[i] * np.exp(1.0j * phi[i]) for i in range(self.dim)])
             self.psi0 = np.array(psi)
-            self.psi = QJL.convert(QJLType_psi, [self.psi0]) # Initial guesses of states (a list of arrays)
+            self.psi = QJL.convert(
+                QJLType_psi, [self.psi0]
+            )  # Initial guesses of states (a list of arrays)
         else:
             self.psi0 = np.array(self.psi0[0], dtype=np.complex128)
             self.psi = QJL.convert(QJLType_psi, self.psi)
@@ -246,12 +275,15 @@ class ComprehensiveSystem:
                         np.zeros(len(self.control_coefficients[0])),
                     )
                 )
-        else: pass
-        
+        else:
+            pass
+
         # ## TODO
-        QJLType_ctrl = QJL.Vector[QJL.Vector[QJL.Vector[QJL.Float64]]] 
-        self.ctrl0 = QJL.convert(QJLType_ctrl, [[c for c in ctrls ]for ctrls in self.ctrl0])
-        
+        QJLType_ctrl = QJL.Vector[QJL.Vector[QJL.Vector[QJL.Float64]]]
+        self.ctrl0 = QJL.convert(
+            QJLType_ctrl, [[c for c in ctrls] for ctrls in self.ctrl0]
+        )
+
         QJLType_C = QJL.Vector[QJL.Vector[QJL.ComplexF64]]
         if self.measurement0 == []:
             np.random.seed(self.seed)
@@ -271,16 +303,21 @@ class ComprehensiveSystem:
         if type(H0) != np.ndarray:
             #### linear interpolation  ####
             f = interp1d(self.tspan, H0, axis=0)
-        else: pass
+        else:
+            pass
         number = math.ceil((len(self.tspan) - 1) / len(self.control_coefficients[0]))
         if len(self.tspan) - 1 % len(self.control_coefficients[0]) != 0:
             tnum = number * len(self.control_coefficients[0])
             self.tspan = np.linspace(self.tspan[0], self.tspan[-1], tnum + 1)
             if type(H0) != np.ndarray:
                 H0_inter = f(self.tspan)
-                self.freeHamiltonian = [np.array(x, dtype=np.complex128) for x in H0_inter[:-1]]
-            else: pass
-        else: pass
+                self.freeHamiltonian = [
+                    np.array(x, dtype=np.complex128) for x in H0_inter[:-1]
+                ]
+            else:
+                pass
+        else:
+            pass
 
         self.dynamics_type = "dynamics"
 
@@ -289,7 +326,7 @@ class ComprehensiveSystem:
         The parameterization of a state is
         \begin{align}
         \rho=\sum_i K_i\rho_0K_i^{\dagger},
-        \end{align} 
+        \end{align}
 
         where $\rho$ is the evolved density matrix, $K_i$ is the Kraus operator.
 
@@ -299,8 +336,8 @@ class ComprehensiveSystem:
             -- Kraus operators.
 
         > **dK:** `list`
-            -- Derivatives of the Kraus operators on the unknown parameters to be 
-            estimated. For example, dK[0] is the derivative vector on the first 
+            -- Derivatives of the Kraus operators on the unknown parameters to be
+            estimated. For example, dK[0] is the derivative vector on the first
             parameter.
         """
 
@@ -328,7 +365,9 @@ class ComprehensiveSystem:
             phi = 2 * np.pi * np.random.random(self.dim)
             psi = np.array([r[i] * np.exp(1.0j * phi[i]) for i in range(self.dim)])
             self.psi0 = np.array(psi)
-            self.psi = QJL.convert(QJLType_psi, [self.psi0]) # Initial guesses of states (a list of arrays)
+            self.psi = QJL.convert(
+                QJLType_psi, [self.psi0]
+            )  # Initial guesses of states (a list of arrays)
         else:
             self.psi0 = np.array(self.psi0[0], dtype=np.complex128)
             self.psi = QJL.convert(QJLType_psi, self.psi)
@@ -361,31 +400,29 @@ class ComprehensiveSystem:
             -- Weight matrix.
 
         > **M:** `list of matrices`
-            -- A set of positive operator-valued measure (POVM). The default measurement 
+            -- A set of positive operator-valued measure (POVM). The default measurement
             is a set of rank-one symmetric informationally complete POVM (SIC-POVM).
 
         > **target:** `string`
-            -- Objective functions for comprehensive optimization. Options are:  
-            "QFIM" (default) -- choose QFI (QFIM) as the objective function.  
-            "CFIM" -- choose CFI (CFIM) as the objective function.  
-            "HCRB" -- choose HCRB as the objective function.  
+            -- Objective functions for comprehensive optimization. Options are:
+            "QFIM" (default) -- choose QFI (QFIM) as the objective function.
+            "CFIM" -- choose CFI (CFIM) as the objective function.
+            "HCRB" -- choose HCRB as the objective function.
 
         > **LDtype:** `string`
-            -- Types of QFI (QFIM) can be set as the objective function. Options are:  
-            "SLD" (default) -- QFI (QFIM) based on symmetric logarithmic derivative (SLD).  
-            "RLD" -- QFI (QFIM) based on right logarithmic derivative (RLD).  
-            "LLD" -- QFI (QFIM) based on left logarithmic derivative (LLD). 
+            -- Types of QFI (QFIM) can be set as the objective function. Options are:
+            "SLD" (default) -- QFI (QFIM) based on symmetric logarithmic derivative (SLD).
+            "RLD" -- QFI (QFIM) based on right logarithmic derivative (RLD).
+            "LLD" -- QFI (QFIM) based on left logarithmic derivative (LLD).
 
-        **Note:** 
-            SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state 
+        **Note:**
+            SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state
             which can be downloaded from [here](http://www.physics.umb.edu/Research/QBism/
             solutions.html).
         """
 
         if self.dynamics_type != "dynamics":
-            raise ValueError(
-                "Supported type of dynamics is Lindblad."
-                )
+            raise ValueError("Supported type of dynamics is Lindblad.")
 
         if W == []:
             W = np.eye(len(self.Hamiltonian_derivative))
@@ -405,9 +442,7 @@ class ComprehensiveSystem:
             elif target == "QFIM" and (
                 LDtype == "SLD" or LDtype == "RLD" or LDtype == "LLD"
             ):
-                self.obj = QJL.QFIM_obj(
-                    self.W, self.eps, self.para_type, LDtype
-                )
+                self.obj = QJL.QFIM_obj(self.W, self.eps, self.para_type, LDtype)
             elif target == "CFIM":
                 M = SIC(len(self.psi))
                 self.obj = QJL.CFIM_obj(M, self.W, self.eps, self.para_type)
@@ -417,7 +452,10 @@ class ComprehensiveSystem:
                 )
 
         self.opt = QJL.StateControlOpt(
-            psi=self.psi, ctrl=self.control_coefficients, ctrl_bound=self.ctrl_bound, seed=self.seed
+            psi=self.psi,
+            ctrl=self.control_coefficients,
+            ctrl_bound=self.ctrl_bound,
+            seed=self.seed,
         )
         self.output = QJL.Output(self.opt, save=self.savefile)
 
@@ -430,14 +468,16 @@ class ComprehensiveSystem:
             self.tspan,
             self.decay_opt,
             self.gamma,
-            dyn_method = self.dyn_method,
-            )
+            dyn_method=self.dyn_method,
+        )
         system = QJL.QuanEstSystem(
             self.opt, self.alg, self.obj, self.dynamic, self.output
         )
         QJL.run(system)
 
-        max_num = self.max_episode if type(self.max_episode) == int else self.max_episode[0]
+        max_num = (
+            self.max_episode if type(self.max_episode) == int else self.max_episode[0]
+        )
         self.load_save_states(max_num)
         self.load_save_ctrls(len(self.control_Hamiltonian), max_num)
 
@@ -455,9 +495,7 @@ class ComprehensiveSystem:
         """
 
         if self.dynamics_type != "dynamics":
-            raise ValueError(
-                "Supported type of dynamics is Lindblad."
-                )
+            raise ValueError("Supported type of dynamics is Lindblad.")
 
         if W == []:
             W = np.eye(len(self.Hamiltonian_derivative))
@@ -467,7 +505,10 @@ class ComprehensiveSystem:
 
         self.obj = QJL.CFIM_obj([], self.W, self.eps, self.para_type)
         self.opt = QJL.ControlMeasurementOpt(
-            ctrl=self.control_coefficients, M=self.C, ctrl_bound=self.ctrl_bound, seed=self.seed
+            ctrl=self.control_coefficients,
+            M=self.C,
+            ctrl_bound=self.ctrl_bound,
+            seed=self.seed,
         )
         self.output = QJL.Output(self.opt, save=self.savefile)
 
@@ -480,15 +521,17 @@ class ComprehensiveSystem:
             self.tspan,
             self.decay_opt,
             self.gamma,
-            dyn_method =self.dyn_method,
-            )
+            dyn_method=self.dyn_method,
+        )
 
         system = QJL.QuanEstSystem(
             self.opt, self.alg, self.obj, self.dynamic, self.output
         )
         QJL.run(system)
 
-        max_num = self.max_episode if type(self.max_episode) == int else self.max_episode[0]
+        max_num = (
+            self.max_episode if type(self.max_episode) == int else self.max_episode[0]
+        )
         self.load_save_ctrls_alt(len(self.control_Hamiltonian), max_num)
         self.load_save_meas(self.dim, max_num)
 
@@ -570,7 +613,8 @@ class ComprehensiveSystem:
                     if type(self.freeHamiltonian) != np.ndarray:
                         #### linear interpolation  ####
                         f = interp1d(self.tspan, self.freeHamiltonian, axis=0)
-                    else: pass
+                    else:
+                        pass
                     number = math.ceil((len(self.tspan) - 1) / len(self.ctrl[0]))
                     if len(self.tspan) - 1 % len(self.ctrl[0]) != 0:
                         tnum = number * len(self.ctrl[0])
@@ -579,9 +623,13 @@ class ComprehensiveSystem:
                         )
                         if type(self.freeHamiltonian) != np.ndarray:
                             H0_inter = f(self.tspan)
-                            self.freeHamiltonian = [np.array(x, dtype=np.complex128) for x in H0_inter]
-                        else: pass
-                    else: pass
+                            self.freeHamiltonian = [
+                                np.array(x, dtype=np.complex128) for x in H0_inter
+                            ]
+                        else:
+                            pass
+                    else:
+                        pass
 
                     if type(self.freeHamiltonian) == np.ndarray:
                         H0 = np.array(self.freeHamiltonian, dtype=np.complex128)
@@ -589,7 +637,10 @@ class ComprehensiveSystem:
                             np.array(x, dtype=np.complex128)
                             for x in self.control_Hamiltonian
                         ]
-                        self.ctrl = [np.array(self.ctrl[i]).repeat(number) for i in range(len(Hc))]
+                        self.ctrl = [
+                            np.array(self.ctrl[i]).repeat(number)
+                            for i in range(len(Hc))
+                        ]
                         Htot = []
                         for i in range(len(self.ctrl[0])):
                             S_ctrl = sum(
@@ -608,7 +659,10 @@ class ComprehensiveSystem:
                             np.array(x, dtype=np.complex128)
                             for x in self.control_Hamiltonian
                         ]
-                        self.ctrl = [np.array(self.ctrl[i]).repeat(number) for i in range(len(Hc))]
+                        self.ctrl = [
+                            np.array(self.ctrl[i]).repeat(number)
+                            for i in range(len(Hc))
+                        ]
                         Htot = []
                         for i in range(len(self.ctrl[0])):
                             S_ctrl = sum(
@@ -626,16 +680,14 @@ class ComprehensiveSystem:
                 self.tspan,
                 self.decay_opt,
                 self.gamma,
-                dyn_method = self.dyn_method,
+                dyn_method=self.dyn_method,
             )
         elif self.dynamics_type == "Kraus":
             if W == []:
                 W = np.eye(self.para_num)
             self.W = W
         else:
-            raise ValueError(
-                "Supported type of dynamics are Lindblad and Kraus."
-                )
+            raise ValueError("Supported type of dynamics are Lindblad and Kraus.")
 
         self.obj = QJL.CFIM_obj([], self.W, self.eps, self.para_type)
         self.opt = QJL.StateMeasurementOpt(psi=list(self.psi), M=self.C, seed=self.seed)
@@ -646,10 +698,12 @@ class ComprehensiveSystem:
         )
         QJL.run(system)
 
-        max_num = self.max_episode if type(self.max_episode) == int else self.max_episode[0]
+        max_num = (
+            self.max_episode if type(self.max_episode) == int else self.max_episode[0]
+        )
         self.load_save_states(max_num)
         self.load_save_meas(self.dim, max_num)
-        
+
     def SCM(self, W=[]):
         """
         Comprehensive optimization of the probe state, control and measurement (SCM).
@@ -661,16 +715,18 @@ class ComprehensiveSystem:
         """
 
         if self.dynamics_type != "dynamics":
-            raise ValueError(
-                "Supported type of dynamics is Lindblad."
-                )
+            raise ValueError("Supported type of dynamics is Lindblad.")
         if W == []:
             W = np.eye(len(self.Hamiltonian_derivative))
         self.W = W
 
         self.obj = QJL.CFIM_obj([], self.W, self.eps, self.para_type)
         self.opt = QJL.StateControlMeasurementOpt(
-            psi=self.psi, ctrl=self.control_coefficients, M=self.C, ctrl_bound=self.ctrl_bound, seed=self.seed
+            psi=self.psi,
+            ctrl=self.control_coefficients,
+            M=self.C,
+            ctrl_bound=self.ctrl_bound,
+            seed=self.seed,
         )
         self.output = QJL.Output(self.opt, save=self.savefile)
 
@@ -683,20 +739,22 @@ class ComprehensiveSystem:
             self.tspan,
             self.decay_opt,
             self.gamma,
-            )
+        )
 
         system = QJL.QuanEstSystem(
             self.opt, self.alg, self.obj, self.dynamic, self.output
         )
         QJL.run(system)
 
-        max_num = self.max_episode if type(self.max_episode) == int else self.max_episode[0]
+        max_num = (
+            self.max_episode if type(self.max_episode) == int else self.max_episode[0]
+        )
         self.load_save_states(max_num)
         self.load_save_ctrls(len(self.control_Hamiltonian), max_num)
         self.load_save_meas(self.dim, max_num)
 
-def ComprehensiveOpt(savefile=False, method="DE", **kwargs):
 
+def ComprehensiveOpt(savefile=False, method="DE", **kwargs):
     if method == "AD":
         return compopt.AD_Compopt(savefile=savefile, **kwargs)
     elif method == "PSO":
