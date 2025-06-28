@@ -6,6 +6,7 @@ from sympy import Matrix, GramSchmidt
 from itertools import product
 import juliacall
 
+
 def load_julia():
     """
     Load Julia.
@@ -14,6 +15,7 @@ def load_julia():
     jl = juliacall.newmodule("QuanEstimation")
     jl.Main.seval("using QuanEstimation, PythonCall")
     return jl.Main.QuanEstimation
+
 
 def mat_vec_convert(A):
     if A.shape[1] == 1:
@@ -51,7 +53,7 @@ def suN_generator(n):
 
     Parameters
     ----------
-    > **n:** `int` 
+    > **n:** `int`
         -- The dimension of the system.
 
     Returns
@@ -97,16 +99,16 @@ def suN_generator(n):
 def gramschmidt(A):
     """
     Perform the Gram-Schmidt process on a set of vectors A to obtain an orthonormal basis.
-    
+
     Parameters
     ----------
     > **A:** `list` of `numpy.ndarray`
         -- A list of vectors (numpy arrays) to be orthonormalized.
-    
+
     Returns
     ----------
     A list of orthonormal vectors.
-    
+
     Raises
     ----------
     > **ValueError:** If the input list is empty or contains non-numeric vectors.
@@ -128,14 +130,14 @@ def basis(dim, index):
     """
     Generate a basis vector in the Hilbert space of dimension `dim` with the specified index.
     The index is 0-based, meaning that the first basis vector corresponds to index 0.
-    
+
     Parameters
     ----------
     > **dim:** `int`
         -- The dimension of the Hilbert space.
     > **index:** `int`
         -- The index of the basis vector to generate (0-based).
-    
+
     Returns
     ----------
     A column vector of shape (dim, 1) representing the basis vector.
@@ -184,20 +186,20 @@ def sic_povm(fiducial):
 
 def SIC(dim):
     """
-    Generation of a set of rank-one symmetric informationally complete 
+    Generation of a set of rank-one symmetric informationally complete
     positive operator-valued measure (SIC-POVM).
 
     Parameters
     ----------
-    > **dim:** `int` 
+    > **dim:** `int`
         -- The dimension of the system.
 
     Returns
     ----------
     A set of SCI-POVM.
 
-    **Note:** 
-        SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state 
+    **Note:**
+        SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state
         which can be downloaded from [here](http://www.physics.umb.edu/Research/QBism/
         solutions.html).
     """
@@ -261,8 +263,8 @@ def BayesInput(x, func, dfunc, channel="dynamics"):
         -- Function defined by the users which returns dH or dK.
 
     > **channel:** `string`
-        -- Seeting the output of this function. Options are:  
-        "dynamics" (default) --  The output of this function is H and dH.  
+        -- Seeting the output of this function. Options are:
+        "dynamics" (default) --  The output of this function is H and dH.
         "Kraus" (default) --  The output of this function is K and dHK.
 
     Returns

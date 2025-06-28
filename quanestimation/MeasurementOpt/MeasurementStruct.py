@@ -11,52 +11,51 @@ from quanestimation.Common.Common import gramschmidt, sic_povm
 
 class MeasurementSystem:
     """
-    Attributes
-    ----------
-    > **mtype:** `string`
-        -- The type of scenarios for the measurement optimization. Options are:  
-        "projection" (default) -- Optimization of rank-one projective measurements.  
-        "input" -- Find the optimal linear combination or the optimal rotated measurement 
-        of a given set of POVM.
+     Attributes
+     ----------
+     > **mtype:** `string`
+         -- The type of scenarios for the measurement optimization. Options are:
+         "projection" (default) -- Optimization of rank-one projective measurements.
+         "input" -- Find the optimal linear combination or the optimal rotated measurement
+         of a given set of POVM.
 
-    > **minput:** `list`
-        -- In the case of optimization of rank-one projective measurements, the 
-        `minput` should keep empty. For finding the optimal linear combination and 
-        the optimal rotated measurement of a given set of POVM, the input rule are 
-        `minput=["LC", [Pi1,Pi2,...], m]` and `minput=["LC", [Pi1,Pi2,...]]` respectively.
-        Here `[Pi1,Pi2,...]` represents a list of input POVM and `m` is the number of operators 
-        of the output measurement. 
+     > **minput:** `list`
+         -- In the case of optimization of rank-one projective measurements, the
+         `minput` should keep empty. For finding the optimal linear combination and
+         the optimal rotated measurement of a given set of POVM, the input rule are
+         `minput=["LC", [Pi1,Pi2,...], m]` and `minput=["LC", [Pi1,Pi2,...]]` respectively.
+         Here `[Pi1,Pi2,...]` represents a list of input POVM and `m` is the number of operators
+         of the output measurement.
 
-    > **savefile:** `bool`
-        -- Whether or not to save all the measurements.  
-        If set `True` then the measurements and the values of the 
-        objective function obtained in all episodes will be saved during 
-        the training. If set `False` the measurement in the final 
-        episode and the values of the objective function in all episodes 
-        will be saved.
+     > **savefile:** `bool`
+         -- Whether or not to save all the measurements.
+         If set `True` then the measurements and the values of the
+         objective function obtained in all episodes will be saved during
+         the training. If set `False` the measurement in the final
+         episode and the values of the objective function in all episodes
+         will be saved.
 
-   > **measurement0:** `list of arrays`
-        -- Initial guesses of measurements.
+    > **measurement0:** `list of arrays`
+         -- Initial guesses of measurements.
 
-    > **seed:** `int`
-        -- Random seed.
+     > **seed:** `int`
+         -- Random seed.
 
-    > **eps:** `float`
-        -- Machine epsilon.
+     > **eps:** `float`
+         -- Machine epsilon.
 
-    > **load:** `bool`
-        -- Whether or not to load measurements in the current location.  
-        If set `True` then the program will load measurement from "measurements.csv"
-        file in the current location and use it as the initial measurement.
+     > **load:** `bool`
+         -- Whether or not to load measurements in the current location.
+         If set `True` then the program will load measurement from "measurements.csv"
+         file in the current location and use it as the initial measurement.
 
-    > **dyn_method:** `string`
-        -- The method for solving the Lindblad dynamcs. Options are:
-        "expm" (default) -- matrix exponential.
-        "ode" -- ordinary differential equation solvers.  
+     > **dyn_method:** `string`
+         -- The method for solving the Lindblad dynamcs. Options are:
+         "expm" (default) -- matrix exponential.
+         "ode" -- ordinary differential equation solvers.
     """
 
     def __init__(self, mtype, minput, savefile, measurement0, seed, eps, load):
-
         self.mtype = mtype
         self.minput = minput
         self.savefile = savefile
@@ -67,16 +66,29 @@ class MeasurementSystem:
 
     def load_save(self, mnum, max_episode):
         if os.path.exists("measurements.dat"):
-            fl = h5py.File("measurements.dat",'r')
+            fl = h5py.File("measurements.dat", "r")
             dset = fl["measurements"]
             if self.savefile:
-                mdata = np.array([[np.array(fl[fl[dset[i]][j]]).view('complex') for j in range(mnum)] for i in range(max_episode)])
+                mdata = np.array(
+                    [
+                        [
+                            np.array(fl[fl[dset[i]][j]]).view("complex")
+                            for j in range(mnum)
+                        ]
+                        for i in range(max_episode)
+                    ]
+                )
             else:
-                mdata = np.array([np.array(fl[dset[j]]).view('complex') for j in range(mnum)])
+                mdata = np.array(
+                    [np.array(fl[dset[j]]).view("complex") for j in range(mnum)]
+                )
             np.save("measurements", mdata)
-        else: pass
+        else:
+            pass
 
-    def dynamics(self, tspan, rho0, H0, dH, Hc=[], ctrl=[], decay=[], dyn_method="expm"):
+    def dynamics(
+        self, tspan, rho0, H0, dH, Hc=[], ctrl=[], decay=[], dyn_method="expm"
+    ):
         r"""
         The dynamics of a density matrix is of the form  
         
@@ -143,7 +155,7 @@ class MeasurementSystem:
         if self.mtype == "projection":
             self.M_num = len(self.rho0)
             QJLType_C = QJL.Vector[QJL.Vector[QJL.ComplexF64]]
-            
+
             if self.measurement0 == []:
                 np.random.seed(self.seed)
                 M = [[] for i in range(len(self.rho0))]
@@ -214,17 +226,19 @@ class MeasurementSystem:
                 elif len(self.measurement0) >= 1:
                     self.B = [self.measurement0[0][i] for i in range(self.M_num)]
                     self.measurement0 = [[m for m in m0] for m0 in self.measurement0]
-                    
-                
+
                 QJLType_B = QJL.Vector[QJL.Vector[QJL.Float64]]
                 QJLType_pb = QJL.Vector[QJL.Matrix[QJL.ComplexF64]]
                 QJLType_m0 = QJL.Vector[QJL.Vector[QJL.Vector[QJL.ComplexF64]]]
                 self.B = QJL.convert(QJLType_B, self.B)
                 self.povm_basis = QJL.convert(QJLType_pb, self.povm_basis)
                 self.measurement0 = QJL.convert(QJLType_m0, self.measurement0)
-                
+
                 self.opt = QJL.Mopt_LinearComb(
-                    B=self.B, POVM_basis=self.povm_basis, M_num=self.M_num, seed=self.seed
+                    B=self.B,
+                    POVM_basis=self.povm_basis,
+                    M_num=self.M_num,
+                    seed=self.seed,
                 )
 
             elif self.minput[0] == "rotation":
@@ -307,7 +321,8 @@ class MeasurementSystem:
                 )
                 for i in range(Hc_num - ctrl_num):
                     ctrl = np.concatenate((ctrl, np.zeros(len(ctrl[0]))))
-            else: pass
+            else:
+                pass
 
             if len(ctrl[0]) == 1:
                 if type(H0) == np.ndarray:
@@ -329,7 +344,8 @@ class MeasurementSystem:
                 if type(H0) != np.ndarray:
                     #### linear interpolation  ####
                     f = interp1d(self.tspan, H0, axis=0)
-                else: pass
+                else:
+                    pass
                 number = math.ceil((len(self.tspan) - 1) / len(ctrl[0]))
                 if len(self.tspan) - 1 % len(ctrl[0]) != 0:
                     tnum = number * len(ctrl[0])
@@ -337,8 +353,10 @@ class MeasurementSystem:
                     if type(H0) != np.ndarray:
                         H0_inter = f(self.tspan)
                         H0 = [np.array(x, dtype=np.complex128) for x in H0_inter]
-                    else: pass
-                else: pass
+                    else:
+                        pass
+                else:
+                    pass
 
                 if type(H0) == np.ndarray:
                     H0 = np.array(H0, dtype=np.complex128)
@@ -386,7 +404,7 @@ class MeasurementSystem:
                 self.tspan,
                 self.decay_opt,
                 self.gamma,
-                dyn_method = self.dyn_method,
+                dyn_method=self.dyn_method,
             )
         else:
             self.dynamic = QJL.Lindblad(
@@ -394,19 +412,18 @@ class MeasurementSystem:
                 self.Hamiltonian_derivative,
                 self.rho0,
                 self.tspan,
-                dyn_method = self.dyn_method,
+                dyn_method=self.dyn_method,
             )
         self.output = QJL.Output(self.opt, save=self.savefile)
-        
-        self.dynamics_type = "dynamics"
 
+        self.dynamics_type = "dynamics"
 
     def Kraus(self, rho0, K, dK):
         r"""
         The parameterization of a state is
         \begin{align}
         \rho=\sum_i K_i\rho_0K_i^{\dagger},
-        \end{align} 
+        \end{align}
 
         where $\rho$ is the evolved density matrix, $K_i$ is the Kraus operator.
 
@@ -419,8 +436,8 @@ class MeasurementSystem:
             -- Kraus operators.
 
         > **dK:** `list`
-            -- Derivatives of the Kraus operators on the unknown parameters to be 
-            estimated. For example, dK[0] is the derivative vector on the first 
+            -- Derivatives of the Kraus operators on the unknown parameters to be
+            estimated. For example, dK[0] is the derivative vector on the first
             parameter.
         """
         k_num = len(K)
@@ -511,7 +528,10 @@ class MeasurementSystem:
                         self.measurement0[0][i] for i in range(len(self.povm_basis))
                     ]
                 self.opt = QJL.Mopt_LinearComb(
-                    B=self.B, POVM_basis=self.povm_basis, M_num=self.M_num, seed=self.seed
+                    B=self.B,
+                    POVM_basis=self.povm_basis,
+                    M_num=self.M_num,
+                    seed=self.seed,
                 )
 
             elif self.minput[0] == "rotation":
@@ -577,8 +597,8 @@ class MeasurementSystem:
 
     def CFIM(self, W=[]):
         r"""
-        Choose CFI or $\mathrm{Tr}(WI^{-1})$ as the objective function. 
-        In single parameter estimation the objective function is CFI and 
+        Choose CFI or $\mathrm{Tr}(WI^{-1})$ as the objective function.
+        In single parameter estimation the objective function is CFI and
         in multiparameter estimation it will be $\mathrm{Tr}(WI^{-1})$.
 
         Parameters
@@ -596,25 +616,22 @@ class MeasurementSystem:
                 W = np.eye(self.para_num)
             self.W = W
         else:
-            raise ValueError(
-                "Supported type of dynamics are Lindblad and Kraus."
-                )
+            raise ValueError("Supported type of dynamics are Lindblad and Kraus.")
 
-        self.obj = QJL.CFIM_obj(
-            [], self.W, self.eps, self.para_type
-        )  #### m=[]
+        self.obj = QJL.CFIM_obj([], self.W, self.eps, self.para_type)  #### m=[]
         system = QJL.QuanEstSystem(
             self.opt, self.alg, self.obj, self.dynamic, self.output
         )
         QJL.run(system)
-        max_num = self.max_episode if type(self.max_episode) == int else self.max_episode[0]
+        max_num = (
+            self.max_episode if type(self.max_episode) == int else self.max_episode[0]
+        )
         self.load_save(self.M_num, max_num)
 
 
 def MeasurementOpt(
     mtype="projection", minput=[], savefile=False, method="DE", **kwargs
 ):
-
     if method == "AD":
         return Measure.AD_Mopt(mtype, minput, savefile=savefile, **kwargs)
     elif method == "PSO":

@@ -15,9 +15,9 @@ class StateSystem:
     ----------
     > **savefile:**  `bool`
         -- Whether or not to save all the states.
-        If set `True` then the states and the values of the objective function 
-        obtained in all episodes will be saved during the training. If set `False` 
-        the state in the final episode and the values of the objective function in 
+        If set `True` then the states and the values of the objective function
+        obtained in all episodes will be saved during the training. If set `False`
+        the state in the final episode and the values of the objective function in
         all episodes will be saved.
 
     > **psi0:** `list of arrays`
@@ -36,7 +36,6 @@ class StateSystem:
     """
 
     def __init__(self, savefile, psi0, seed, eps, load):
-
         self.savefile = savefile
         self.psi0 = psi0
         self.psi = psi0
@@ -49,14 +48,17 @@ class StateSystem:
 
     def load_save(self, max_episode):
         if os.path.exists("states.dat"):
-            fl = h5py.File("states.dat",'r')
+            fl = h5py.File("states.dat", "r")
             dset = fl["states"]
             if self.savefile:
-                psi = np.array([np.array(fl[dset[i]]).view('complex') for i in range(max_episode)])
+                psi = np.array(
+                    [np.array(fl[dset[i]]).view("complex") for i in range(max_episode)]
+                )
             else:
-                psi = np.array(dset).view('complex')
+                psi = np.array(dset).view("complex")
             np.save("states", psi)
-        else: pass
+        else:
+            pass
 
     def dynamics(self, tspan, H0, dH, Hc=[], ctrl=[], decay=[], dyn_method="expm"):
         r"""
@@ -137,7 +139,8 @@ class StateSystem:
                 )
                 for i in range(Hc_num - ctrl_num):
                     ctrl = np.concatenate((ctrl, np.zeros(len(ctrl[0]))))
-            else: pass
+            else:
+                pass
 
             if len(ctrl[0]) == 1:
                 if type(H0) == np.ndarray:
@@ -161,7 +164,8 @@ class StateSystem:
                 if type(H0) != np.ndarray:
                     #### linear interpolation  ####
                     f = interp1d(self.tspan, H0, axis=0)
-                else: pass
+                else:
+                    pass
                 number = math.ceil((len(self.tspan) - 1) / len(ctrl[0]))
                 if len(self.tspan) - 1 % len(ctrl[0]) != 0:
                     tnum = number * len(ctrl[0])
@@ -169,8 +173,10 @@ class StateSystem:
                     if type(H0) != np.ndarray:
                         H0_inter = f(self.tspan)
                         H0 = [np.array(x, dtype=np.complex128) for x in H0_inter]
-                    else: pass
-                else: pass
+                    else:
+                        pass
+                else:
+                    pass
 
                 if type(H0) == np.ndarray:
                     H0 = np.array(H0, dtype=np.complex128)
@@ -196,7 +202,7 @@ class StateSystem:
                         np.array(x, dtype=np.complex128) for x in Htot
                     ]
                     self.dim = len(self.freeHamiltonian[0])
-                    
+
         QJLType_psi = QJL.Vector[QJL.Vector[QJL.ComplexF64]]
         if self.psi0 == []:
             np.random.seed(self.seed)
@@ -205,11 +211,13 @@ class StateSystem:
             phi = 2 * np.pi * np.random.random(self.dim)
             psi0 = [r[i] * np.exp(1.0j * phi[i]) for i in range(self.dim)]
             self.psi0 = np.array(psi0)
-            self.psi = QJL.convert(QJLType_psi, [self.psi0]) # Initial guesses of states (a list of arrays)
+            self.psi = QJL.convert(
+                QJLType_psi, [self.psi0]
+            )  # Initial guesses of states (a list of arrays)
         else:
             self.psi0 = np.array(self.psi0[0], dtype=np.complex128)
             self.psi = QJL.convert(QJLType_psi, self.psi)
-        
+
         if type(dH) != list:
             raise TypeError("The derivative of Hamiltonian should be a list!")
 
@@ -234,7 +242,7 @@ class StateSystem:
                 self.tspan,
                 self.decay_opt,
                 self.gamma,
-                dyn_method = self.dyn_method,
+                dyn_method=self.dyn_method,
             )
         else:
             self.dynamic = QJL.Lindblad(
@@ -242,7 +250,7 @@ class StateSystem:
                 self.Hamiltonian_derivative,
                 list(self.psi0),
                 self.tspan,
-                dyn_method = self.dyn_method,
+                dyn_method=self.dyn_method,
             )
         self.output = QJL.Output(self.opt, save=self.savefile)
 
@@ -257,7 +265,7 @@ class StateSystem:
         The parameterization of a state is
         \begin{align}
         \rho=\sum_i K_i\rho_0K_i^{\dagger},
-        \end{align} 
+        \end{align}
 
         where $\rho$ is the evolved density matrix, $K_i$ is the Kraus operator.
 
@@ -267,8 +275,8 @@ class StateSystem:
             -- Kraus operators.
 
         > **dK:** `list`
-            -- Derivatives of the Kraus operators on the unknown parameters to be 
-            estimated. For example, dK[0] is the derivative vector on the first 
+            -- Derivatives of the Kraus operators on the unknown parameters to be
+            estimated. For example, dK[0] is the derivative vector on the first
             parameter.
         """
 
@@ -290,7 +298,7 @@ class StateSystem:
             phi = 2 * np.pi * np.random.random(self.dim)
             psi0 = [r[i] * np.exp(1.0j * phi[i]) for i in range(self.dim)]
             self.psi0 = np.array(psi0)  # Initial state (an array)
-            self.psi = [self.psi0] # Initial guesses of states (a list of arrays)
+            self.psi = [self.psi0]  # Initial guesses of states (a list of arrays)
         else:
             self.psi0 = np.array(self.psi0[0], dtype=np.complex128)
             self.psi = [np.array(psi, dtype=np.complex128) for psi in self.psi]
@@ -307,8 +315,8 @@ class StateSystem:
 
     def QFIM(self, W=[], LDtype="SLD"):
         r"""
-        Choose QFI or $\mathrm{Tr}(WF^{-1})$ as the objective function. 
-        In single parameter estimation the objective function is QFI and in 
+        Choose QFI or $\mathrm{Tr}(WF^{-1})$ as the objective function.
+        In single parameter estimation the objective function is QFI and in
         multiparameter estimation it will be $\mathrm{Tr}(WF^{-1})$.
 
         Parameters
@@ -342,21 +350,23 @@ class StateSystem:
         else:
             pass
 
-        self.obj = QJL.QFIM_obj(
-            self.W, self.eps, self.para_type, LDtype
-        )
+        self.obj = QJL.QFIM_obj(self.W, self.eps, self.para_type, LDtype)
         system = QJL.QuanEstSystem(
             self.opt, self.alg, self.obj, self.dynamic, self.output
         )
         QJL.run(system)
 
-        max_num = self.max_episode if isinstance(self.max_episode, int) else self.max_episode[0]
+        max_num = (
+            self.max_episode
+            if isinstance(self.max_episode, int)
+            else self.max_episode[0]
+        )
         self.load_save(max_num)
 
     def CFIM(self, M=[], W=[]):
         r"""
-        Choose CFI or $\mathrm{Tr}(WI^{-1})$ as the objective function. 
-        In single parameter estimation the objective function is CFI and 
+        Choose CFI or $\mathrm{Tr}(WI^{-1})$ as the objective function.
+        In single parameter estimation the objective function is CFI and
         in multiparameter estimation it will be $\mathrm{Tr}(WI^{-1})$.
 
         Parameters
@@ -365,11 +375,11 @@ class StateSystem:
             -- Weight matrix.
 
         > **M:** `list of matrices`
-            -- A set of positive operator-valued measure (POVM). The default measurement 
+            -- A set of positive operator-valued measure (POVM). The default measurement
             is a set of rank-one symmetric informationally complete POVM (SIC-POVM).
 
-        **Note:** 
-            SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state 
+        **Note:**
+            SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state
             which can be downloaded from [here](http://www.physics.umb.edu/Research/QBism/
             solutions.html).
         """
@@ -394,31 +404,37 @@ class StateSystem:
         )
         QJL.run(system)
 
-        max_num = self.max_episode if isinstance(self.max_episode, int) else self.max_episode[0]
+        max_num = (
+            self.max_episode
+            if isinstance(self.max_episode, int)
+            else self.max_episode[0]
+        )
         self.load_save(max_num)
 
     def HCRB(self, W=[]):
         """
-        Choose HCRB as the objective function. 
+        Choose HCRB as the objective function.
 
-        **Notes:** (1) In single parameter estimation, HCRB is equivalent to QFI, please  
+        **Notes:** (1) In single parameter estimation, HCRB is equivalent to QFI, please
         choose QFI as the objective function. (2) GRAPE and auto-GRAPE are not available
         when the objective function is HCRB. Supported methods are PSO, DE and DDPG.
 
         Parameters
         ----------
-        > **W:** `matrix` 
+        > **W:** `matrix`
             -- Weight matrix.
         """
-        
+
         if self.dynamics_type == "dynamics":
             if W == []:
                 W = np.eye(len(self.Hamiltonian_derivative))
             self.W = W
             if len(self.Hamiltonian_derivative) == 1:
-                print("Program terminated. In the single-parameter scenario, the HCRB is equivalent to the QFI. Please choose 'QFIM' as the objective function"
-                    )
-            else: pass
+                print(
+                    "Program terminated. In the single-parameter scenario, the HCRB is equivalent to the QFI. Please choose 'QFIM' as the objective function"
+                )
+            else:
+                pass
 
         elif self.dynamics_type == "Kraus":
             if W == []:
@@ -428,24 +444,26 @@ class StateSystem:
                 raise ValueError(
                     "In single parameter scenario, HCRB is equivalent to QFI. Please choose QFIM as the target function for control optimization",
                 )
-            else: pass
+            else:
+                pass
         else:
-            raise ValueError(
-                "Supported type of dynamics are Lindblad and Kraus."
-                )
+            raise ValueError("Supported type of dynamics are Lindblad and Kraus.")
 
         self.obj = QJL.HCRB_obj(self.W, self.eps, self.para_type)
         system = QJL.QuanEstSystem(
-                self.opt, self.alg, self.obj, self.dynamic, self.output
+            self.opt, self.alg, self.obj, self.dynamic, self.output
         )
         QJL.run(system)
 
-        max_num = self.max_episode if isinstance(self.max_episode, int) else self.max_episode[0]
+        max_num = (
+            self.max_episode
+            if isinstance(self.max_episode, int)
+            else self.max_episode[0]
+        )
         self.load_save(max_num)
 
 
 def StateOpt(savefile=False, method="AD", **kwargs):
-
     if method == "AD":
         return stateoptimize.AD_Sopt(savefile=savefile, **kwargs)
     elif method == "PSO":
@@ -453,9 +471,7 @@ def StateOpt(savefile=False, method="AD", **kwargs):
     elif method == "DE":
         return stateoptimize.DE_Sopt(savefile=savefile, **kwargs)
     elif method == "DDPG":
-        raise ValueError(
-            "'DDPG' is currently deprecated and will be fixed soon."    
-            )
+        raise ValueError("'DDPG' is currently deprecated and will be fixed soon.")
         # return stateoptimize.DDPG_Sopt(savefile=savefile, **kwargs)
     elif method == "NM":
         return stateoptimize.NM_Sopt(savefile=savefile, **kwargs)
