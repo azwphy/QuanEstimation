@@ -22,18 +22,18 @@ class Adapt:
         -- Initial state (density matrix).
 
     > **method:** `string`
-        -- Choose the method for updating the tunable parameters (u). Options are:  
-        "FOP" (default) -- Fix optimal point.  
+        -- Choose the method for updating the tunable parameters (u). Options are:
+        "FOP" (default) -- Fix optimal point.
         "MI" -- mutual information.
-        
+
     > **savefile:** `bool`
-        -- Whether or not to save all the posterior distributions.  
-        If set `True` then three files "pout.npy", "xout.npy" and "y.npy" will be 
+        -- Whether or not to save all the posterior distributions.
+        If set `True` then three files "pout.npy", "xout.npy" and "y.npy" will be
         generated including the posterior distributions, the estimated values, and
-        the experimental results in the iterations. If set `False` the posterior 
-        distribution in the final iteration, the estimated values and the experimental 
-        results in all iterations will be saved in "pout.npy", "xout.npy" and "y.npy". 
-        
+        the experimental results in the iterations. If set `False` the posterior
+        distribution in the final iteration, the estimated values and the experimental
+        results in all iterations will be saved in "pout.npy", "xout.npy" and "y.npy".
+
     > **max_episode:** `int`
         -- The number of episodes.
 
@@ -41,8 +41,9 @@ class Adapt:
         -- Machine epsilon.
     """
 
-    def __init__(self, x, p, rho0, method="FOP", savefile=False, max_episode=1000, eps=1e-8):
-
+    def __init__(
+        self, x, p, rho0, method="FOP", savefile=False, max_episode=1000, eps=1e-8
+    ):
         self.x = x
         self.p = p
         self.rho0 = np.array(rho0, dtype=np.complex128)
@@ -108,7 +109,7 @@ class Adapt:
 
     def Kraus(self, K, dK):
         r"""
-        Dynamics of the density matrix of the form 
+        Dynamics of the density matrix of the form
         \begin{align}
         \rho=\sum_i K_i\rho_0K_i^{\dagger}
         \end{align}
@@ -121,7 +122,7 @@ class Adapt:
             -- Kraus operator(s) with respect to the values in x.
 
         > **dK:** `multidimensional list`
-            -- Derivatives of the Kraus operator(s) with respect to the unknown parameters 
+            -- Derivatives of the Kraus operator(s) with respect to the unknown parameters
             to be estimated.
         """
 
@@ -132,8 +133,8 @@ class Adapt:
 
     def CFIM(self, M=[], W=[]):
         r"""
-        Choose CFI or $\mathrm{Tr}(WI^{-1})$ as the objective function. 
-        In single parameter estimation the objective function is CFI and 
+        Choose CFI or $\mathrm{Tr}(WI^{-1})$ as the objective function.
+        In single parameter estimation the objective function is CFI and
         in multiparameter estimation it will be $\mathrm{Tr}(WI^{-1})$.
 
         Parameters
@@ -142,11 +143,11 @@ class Adapt:
             -- Weight matrix.
 
         > **M:** `list of matrices`
-            -- A set of positive operator-valued measure (POVM). The default measurement 
+            -- A set of positive operator-valued measure (POVM). The default measurement
             is a set of rank-one symmetric informationally complete POVM (SIC-POVM).
 
-        **Note:** 
-            SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state 
+        **Note:**
+            SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state
             which can be downloaded from [here](http://www.physics.umb.edu/Research/QBism/
             solutions.html).
         """
@@ -188,7 +189,7 @@ class Adapt:
                 self.max_episode,
                 self.eps,
                 self.savefile,
-                self.method
+                self.method,
             )
         else:
             raise ValueError(
@@ -314,7 +315,10 @@ class Adapt:
                 F = []
                 for hi in range(len(self.K)):
                     rho_tp = sum(
-                        [np.dot(Ki, np.dot(self.rho0, Ki.conj().T)) for Ki in self.K[hi]]
+                        [
+                            np.dot(Ki, np.dot(self.rho0, Ki.conj().T))
+                            for Ki in self.K[hi]
+                        ]
                     )
                     drho_tp = sum(
                         [
@@ -343,7 +347,10 @@ class Adapt:
                 F = []
                 for hi in range(len(p_list)):
                     rho_tp = sum(
-                        [np.dot(Ki, np.dot(self.rho0, Ki.conj().T)) for Ki in K_list[hi]]
+                        [
+                            np.dot(Ki, np.dot(self.rho0, Ki.conj().T))
+                            for Ki in K_list[hi]
+                        ]
                     )
                     dK_reshape = [
                         [dK_list[hi][i][j] for i in range(self.k_num)]
@@ -376,9 +383,26 @@ class Adapt:
                     self.dynamic_type
                 )
             )
-    
-def adaptive_dynamics(x, p, M, tspan, rho0, H, dH, decay, Hc, ctrl, W, max_episode, eps, savefile, method, dyn_method="expm"):
 
+
+def adaptive_dynamics(
+    x,
+    p,
+    M,
+    tspan,
+    rho0,
+    H,
+    dH,
+    decay,
+    Hc,
+    ctrl,
+    W,
+    max_episode,
+    eps,
+    savefile,
+    method,
+    dyn_method="expm",
+):
     para_num = len(x)
     dim = np.shape(rho0)[0]
     if para_num == 1:
@@ -389,19 +413,23 @@ def adaptive_dynamics(x, p, M, tspan, rho0, H, dH, decay, Hc, ctrl, W, max_episo
         rho_all = []
         if dyn_method == "expm":
             for hi in range(p_num):
-                dynamics = Lindblad(tspan, rho0, H[hi], dH[hi], decay=decay, Hc=Hc, ctrl=ctrl)
+                dynamics = Lindblad(
+                    tspan, rho0, H[hi], dH[hi], decay=decay, Hc=Hc, ctrl=ctrl
+                )
                 rho_tp, drho_tp = dynamics.expm()
                 F_tp = CFIM(rho_tp[-1], drho_tp[-1], M)
                 F.append(F_tp)
                 rho_all.append(rho_tp[-1])
         elif dyn_method == "ode":
             for hi in range(p_num):
-                dynamics = Lindblad(tspan, rho0, H[hi], dH[hi], decay=decay, Hc=Hc, ctrl=ctrl)
+                dynamics = Lindblad(
+                    tspan, rho0, H[hi], dH[hi], decay=decay, Hc=Hc, ctrl=ctrl
+                )
                 rho_tp, drho_tp = dynamics.ode()
                 F_tp = CFIM(rho_tp[-1], drho_tp[-1], M)
                 F.append(F_tp)
                 rho_all.append(rho_tp[-1])
-        
+
         u = 0.0
         if method == "FOP":
             idx = np.argmax(F)
@@ -410,27 +438,35 @@ def adaptive_dynamics(x, p, M, tspan, rho0, H, dH, decay, Hc, ctrl, W, max_episo
             if savefile == False:
                 y, xout = [], []
                 for ei in range(max_episode):
-                    p, x_out, res_exp, u = iter_FOP_singlepara(p, p_num, x, u, rho_all, M, dim, x_opt, ei)
+                    p, x_out, res_exp, u = iter_FOP_singlepara(
+                        p, p_num, x, u, rho_all, M, dim, x_opt, ei
+                    )
                     xout.append(x_out)
                     y.append(res_exp)
                 savefile_false(p, xout, y)
             else:
                 y, xout = [], []
                 for ei in range(max_episode):
-                    p, x_out, res_exp, u = iter_FOP_singlepara(p, p_num, x, u, rho_all, M, dim, x_opt, ei)
+                    p, x_out, res_exp, u = iter_FOP_singlepara(
+                        p, p_num, x, u, rho_all, M, dim, x_opt, ei
+                    )
                     savefile_true([np.array(p)], x_out, res_exp)
         elif method == "MI":
             if savefile == False:
                 y, xout = [], []
                 for ei in range(max_episode):
-                    p, x_out, res_exp, u = iter_MI_singlepara(p, p_num, x, u, rho_all, M, dim, ei)
+                    p, x_out, res_exp, u = iter_MI_singlepara(
+                        p, p_num, x, u, rho_all, M, dim, ei
+                    )
                     xout.append(x_out)
                     y.append(res_exp)
                 savefile_false(p, xout, y)
             else:
                 y, xout = [], []
                 for ei in range(max_episode):
-                    p, x_out, res_exp, u = iter_MI_singlepara(p, p_num, x, u, rho_all, M, dim, ei)
+                    p, x_out, res_exp, u = iter_MI_singlepara(
+                        p, p_num, x, u, rho_all, M, dim, ei
+                    )
                     savefile_true([np.array(p)], x_out, res_exp)
     else:
         #### miltiparameter senario ####
@@ -454,7 +490,9 @@ def adaptive_dynamics(x, p, M, tspan, rho0, H, dH, decay, Hc, ctrl, W, max_episo
         rho_all = []
         if dyn_method == "expm":
             for hi in range(p_num):
-                dynamics = Lindblad(tspan, rho0, H_list[hi], dH_list[hi], decay=decay, Hc=Hc, ctrl=ctrl)
+                dynamics = Lindblad(
+                    tspan, rho0, H_list[hi], dH_list[hi], decay=decay, Hc=Hc, ctrl=ctrl
+                )
                 rho_tp, drho_tp = dynamics.expm()
                 F_tp = CFIM(rho_tp[-1], drho_tp[-1], M)
                 if np.linalg.det(F_tp) < eps:
@@ -464,7 +502,9 @@ def adaptive_dynamics(x, p, M, tspan, rho0, H, dH, decay, Hc, ctrl, W, max_episo
                 rho_all.append(rho_tp[-1])
         elif dyn_method == "ode":
             for hi in range(p_num):
-                dynamics = Lindblad(tspan, rho0, H_list[hi], dH_list[hi], decay=decay, Hc=Hc, ctrl=ctrl)
+                dynamics = Lindblad(
+                    tspan, rho0, H_list[hi], dH_list[hi], decay=decay, Hc=Hc, ctrl=ctrl
+                )
                 rho_tp, drho_tp = dynamics.ode()
                 F_tp = CFIM(rho_tp[-1], drho_tp[-1], M)
                 if np.linalg.det(F_tp) < eps:
@@ -482,26 +522,57 @@ def adaptive_dynamics(x, p, M, tspan, rho0, H, dH, decay, Hc, ctrl, W, max_episo
             if savefile == False:
                 y, xout = [], []
                 for ei in range(max_episode):
-                    p, x_out, res_exp, u = iter_FOP_multipara(p, p_num, para_num, x, x_list, u, rho_all, M, dim, x_opt, ei, p_shape)
+                    p, x_out, res_exp, u = iter_FOP_multipara(
+                        p,
+                        p_num,
+                        para_num,
+                        x,
+                        x_list,
+                        u,
+                        rho_all,
+                        M,
+                        dim,
+                        x_opt,
+                        ei,
+                        p_shape,
+                    )
                     xout.append(x_out)
                     y.append(res_exp)
                 savefile_false(p, xout, y)
             else:
                 for ei in range(max_episode):
-                    p, x_out, res_exp, u = iter_FOP_multipara(p, p_num, para_num, x, x_list, u, rho_all, M, dim, x_opt, ei, p_shape)
+                    p, x_out, res_exp, u = iter_FOP_multipara(
+                        p,
+                        p_num,
+                        para_num,
+                        x,
+                        x_list,
+                        u,
+                        rho_all,
+                        M,
+                        dim,
+                        x_opt,
+                        ei,
+                        p_shape,
+                    )
                     savefile_true(np.array(p), x_out, res_exp)
         elif method == "MI":
             if savefile == False:
                 y, xout = [], []
                 for ei in range(max_episode):
-                    p, x_out, res_exp, u = iter_MI_multipara(p, p_num, para_num, x, x_list, u, rho_all, M, dim, ei, p_shape)
+                    p, x_out, res_exp, u = iter_MI_multipara(
+                        p, p_num, para_num, x, x_list, u, rho_all, M, dim, ei, p_shape
+                    )
                     xout.append(x_out)
                     y.append(res_exp)
                 savefile_false(p, xout, y)
             else:
                 for ei in range(max_episode):
-                    p, x_out, res_exp, u = iter_MI_multipara(p, p_num, para_num, x, x_list, u, rho_all, M, dim, ei, p_shape)
+                    p, x_out, res_exp, u = iter_MI_multipara(
+                        p, p_num, para_num, x, x_list, u, rho_all, M, dim, ei, p_shape
+                    )
                     savefile_true(np.array(p), x_out, res_exp)
+
 
 def adaptive_Kraus(x, p, M, rho0, K, dK, W, max_episode, eps, savefile, method):
     para_num = len(x)
@@ -513,7 +584,18 @@ def adaptive_Kraus(x, p, M, rho0, K, dK, W, max_episode, eps, savefile, method):
         rho_all = []
         for hi in range(p_num):
             rho_tp = sum([np.dot(Ki, np.dot(rho0, Ki.conj().T)) for Ki in K[hi]])
-            drho_tp = [sum([(np.dot(dKi, np.dot(rho0, Ki.conj().T)) + np.dot(Ki, np.dot(rho0, dKi.conj().T))) for (Ki, dKi) in zip(K[hi], dKj)]) for dKj in dK[hi]]
+            drho_tp = [
+                sum(
+                    [
+                        (
+                            np.dot(dKi, np.dot(rho0, Ki.conj().T))
+                            + np.dot(Ki, np.dot(rho0, dKi.conj().T))
+                        )
+                        for (Ki, dKi) in zip(K[hi], dKj)
+                    ]
+                )
+                for dKj in dK[hi]
+            ]
             F_tp = CFIM(rho_tp, drho_tp, M)
             F.append(F_tp)
             rho_all.append(rho_tp)
@@ -526,25 +608,33 @@ def adaptive_Kraus(x, p, M, rho0, K, dK, W, max_episode, eps, savefile, method):
             if savefile == False:
                 y, xout = [], []
                 for ei in range(max_episode):
-                    p, x_out, res_exp, u = iter_FOP_singlepara(p, p_num, x, u, rho_all, M, dim, x_opt, ei)
+                    p, x_out, res_exp, u = iter_FOP_singlepara(
+                        p, p_num, x, u, rho_all, M, dim, x_opt, ei
+                    )
                     xout.append(x_out)
                     y.append(res_exp)
                 savefile_false(p, xout, y)
             else:
                 for ei in range(max_episode):
-                    p, x_out, res_exp, u = iter_FOP_singlepara(p, p_num, x, u, rho_all, M, dim, x_opt, ei)
+                    p, x_out, res_exp, u = iter_FOP_singlepara(
+                        p, p_num, x, u, rho_all, M, dim, x_opt, ei
+                    )
                     savefile_true([np.array(p)], x_out, res_exp)
         elif method == "MI":
             if savefile == False:
                 y, xout = [], []
                 for ei in range(max_episode):
-                    p, x_out, res_exp, u = iter_MI_singlepara(p, p_num, x, u, rho_all, M, dim, ei)
+                    p, x_out, res_exp, u = iter_MI_singlepara(
+                        p, p_num, x, u, rho_all, M, dim, ei
+                    )
                     xout.append(x_out)
                     y.append(res_exp)
                 savefile_false(p, xout, y)
             else:
                 for ei in range(max_episode):
-                    p, x_out, res_exp, u = iter_MI_singlepara(p, p_num, x, u, rho_all, M, dim, ei)
+                    p, x_out, res_exp, u = iter_MI_singlepara(
+                        p, p_num, x, u, rho_all, M, dim, ei
+                    )
                     savefile_true([np.array(p)], x_out, res_exp)
     else:
         #### miltiparameter senario ####
@@ -568,8 +658,19 @@ def adaptive_Kraus(x, p, M, rho0, K, dK, W, max_episode, eps, savefile, method):
         rho_all = []
         for hi in range(p_num):
             rho_tp = sum([np.dot(Ki, np.dot(rho0, Ki.conj().T)) for Ki in K_list[hi]])
-            dK_reshape = [[dK_list[hi][i][j] for i in range(k_num)] for j in range(para_num)]
-            drho_tp = [sum([np.dot(dKi, np.dot(rho0, Ki.conj().T))+ np.dot(Ki, np.dot(rho0, dKi.conj().T)) for (Ki, dKi) in zip(K_list[hi], dKj)]) for dKj in dK_reshape]
+            dK_reshape = [
+                [dK_list[hi][i][j] for i in range(k_num)] for j in range(para_num)
+            ]
+            drho_tp = [
+                sum(
+                    [
+                        np.dot(dKi, np.dot(rho0, Ki.conj().T))
+                        + np.dot(Ki, np.dot(rho0, dKi.conj().T))
+                        for (Ki, dKi) in zip(K_list[hi], dKj)
+                    ]
+                )
+                for dKj in dK_reshape
+            ]
             F_tp = CFIM(rho_tp, drho_tp, M)
             if np.linalg.det(F_tp) < eps:
                 F.append(eps)
@@ -586,26 +687,57 @@ def adaptive_Kraus(x, p, M, rho0, K, dK, W, max_episode, eps, savefile, method):
             if savefile == False:
                 y, xout = [], []
                 for ei in range(max_episode):
-                    p, x_out, res_exp, u = iter_FOP_multipara(p, p_num, para_num, x, x_list, u, rho_all, M, dim, x_opt, ei, p_shape)
+                    p, x_out, res_exp, u = iter_FOP_multipara(
+                        p,
+                        p_num,
+                        para_num,
+                        x,
+                        x_list,
+                        u,
+                        rho_all,
+                        M,
+                        dim,
+                        x_opt,
+                        ei,
+                        p_shape,
+                    )
                     xout.append(x_out)
                     y.append(res_exp)
                 savefile_false(p, xout, y)
             else:
                 for ei in range(max_episode):
-                    p, x_out, res_exp, u = iter_FOP_multipara(p, p_num, para_num, x, x_list, u, rho_all, M, dim, x_opt, ei, p_shape)
+                    p, x_out, res_exp, u = iter_FOP_multipara(
+                        p,
+                        p_num,
+                        para_num,
+                        x,
+                        x_list,
+                        u,
+                        rho_all,
+                        M,
+                        dim,
+                        x_opt,
+                        ei,
+                        p_shape,
+                    )
                     savefile_true(np.array(p), x_out, res_exp)
         elif method == "MI":
             if savefile == False:
                 y, xout = [], []
                 for ei in range(max_episode):
-                    p, x_out, res_exp, u = iter_MI_multipara(p, p_num, para_num, x, x_list, u, rho_all, M, dim, ei, p_shape)
+                    p, x_out, res_exp, u = iter_MI_multipara(
+                        p, p_num, para_num, x, x_list, u, rho_all, M, dim, ei, p_shape
+                    )
                     xout.append(x_out)
                     y.append(res_exp)
                 savefile_false(p, xout, y)
             else:
                 for ei in range(max_episode):
-                    p, x_out, res_exp, u = iter_MI_multipara(p, p_num, para_num, x, x_list, u, rho_all, M, dim, ei, p_shape)
+                    p, x_out, res_exp, u = iter_MI_multipara(
+                        p, p_num, para_num, x, x_list, u, rho_all, M, dim, ei, p_shape
+                    )
                     savefile_true(np.array(p), x_out, res_exp)
+
 
 def iter_FOP_singlepara(p, p_num, x, u, rho_all, M, dim, x_opt, ei):
     rho = [np.zeros((dim, dim), dtype=np.complex128) for i in range(p_num)]
@@ -622,7 +754,7 @@ def iter_FOP_singlepara(p, p_num, x, u, rho_all, M, dim, x_opt, ei):
     arr = np.array([pyx[m] * p[m] for m in range(p_num)])
     py = simpson(arr, x[0])
     p_update = pyx * p / py
-    
+
     for i in range(p_num):
         if x[0][0] < (x[0][i] + u) < x[0][-1]:
             p[i] = p_update[i]
@@ -639,11 +771,23 @@ def iter_FOP_singlepara(p, p_num, x, u, rho_all, M, dim, x_opt, ei):
             raise ValueError("please increase the regime of the parameters.")
     return p, x_out, res_exp, u
 
-def iter_FOP_multipara(p, p_num, para_num, x, x_list, u, rho_all, M, dim, x_opt, ei, p_shape):
+
+def iter_FOP_multipara(
+    p, p_num, para_num, x, x_list, u, rho_all, M, dim, x_opt, ei, p_shape
+):
     rho = [np.zeros((dim, dim), dtype=np.complex128) for i in range(p_num)]
     for hj in range(p_num):
-        idx_list = [np.argmin(np.abs(x[i] - (x_list[hj][i] + u[i]))) for i in range(para_num)]
-        x_idx = int(sum([idx_list[i] * np.prod(np.array(p_shape[(i + 1) :])) for i in range(para_num)]))
+        idx_list = [
+            np.argmin(np.abs(x[i] - (x_list[hj][i] + u[i]))) for i in range(para_num)
+        ]
+        x_idx = int(
+            sum(
+                [
+                    idx_list[i] * np.prod(np.array(p_shape[(i + 1) :]))
+                    for i in range(para_num)
+                ]
+            )
+        )
         rho[hj] = rho_all[x_idx]
     print("The tunable parameter are %s" % (u))
     res_exp = input("Please enter the experimental result: ")
@@ -657,19 +801,22 @@ def iter_FOP_multipara(p, p_num, para_num, x, x_list, u, rho_all, M, dim, x_opt,
         arr = simpson(arr, x[si])
     py = arr
     p_update = p * pyx / py
-    
+
     p_lis = np.zeros(p_num)
     p_ext = extract_ele(p_update, para_num)
     p_up_lis = []
     for p_ele in p_ext:
         p_up_lis.append(p_ele)
     for i in range(p_num):
-        res = [x_list[0][ri] < (x_list[i][ri] + u[ri]) < x_list[-1][ri] for ri in range(para_num)]
+        res = [
+            x_list[0][ri] < (x_list[i][ri] + u[ri]) < x_list[-1][ri]
+            for ri in range(para_num)
+        ]
         if all(res):
-            p_lis[i] =  p_up_lis[i]
+            p_lis[i] = p_up_lis[i]
 
     p = p_lis.reshape(p_shape)
-    
+
     p_idx = np.unravel_index(p.argmax(), p.shape)
     x_out = [x[i][p_idx[i]] for i in range(para_num)]
 
@@ -681,6 +828,7 @@ def iter_FOP_multipara(p, p_num, para_num, x, x_list, u, rho_all, M, dim, x_opt,
             if (x_out[un] + u[un]) > x[un][-1] and (x_out[un] + u[un]) < x[un][0]:
                 raise ValueError("please increase the regime of the parameters.")
     return p, x_out, res_exp, u
+
 
 def iter_MI_singlepara(p, p_num, x, u, rho_all, M, dim, ei):
     rho = [np.zeros((dim, dim), dtype=np.complex128) for i in range(p_num)]
@@ -698,7 +846,7 @@ def iter_MI_singlepara(p, p_num, x, u, rho_all, M, dim, ei):
     arr = np.array([pyx[m] * p[m] for m in range(p_num)])
     py = simpson(arr, x[0])
     p_update = pyx * p / py
-    
+
     for i in range(p_num):
         if x[0][0] < (x[0][i] + u) < x[0][-1]:
             p[i] = p_update[i]
@@ -717,9 +865,11 @@ def iter_MI_singlepara(p, p_num, x, u, rho_all, M, dim, ei):
             rho_u[hk] = rho_all[x_idx]
         value_tp = np.zeros(p_num)
         for mi in range(len(M)):
-            pyx_tp = np.array([np.real(np.trace(np.dot(rho_u[xi], M[mi]))) for xi in range(p_num)])
+            pyx_tp = np.array(
+                [np.real(np.trace(np.dot(rho_u[xi], M[mi]))) for xi in range(p_num)]
+            )
             mean_tp = simpson(np.array([pyx_tp[i] * p[i] for i in range(p_num)]), x[0])
-            value_tp += pyx_tp*np.log2(pyx_tp/mean_tp)
+            value_tp += pyx_tp * np.log2(pyx_tp / mean_tp)
         # arr = np.array([value_tp[i] * p[i] for i in range(p_num)])
         arr = np.zeros(p_num)
         for i in range(p_num):
@@ -733,11 +883,21 @@ def iter_MI_singlepara(p, p_num, x, u, rho_all, M, dim, ei):
             raise ValueError("please increase the regime of the parameters.")
     return p, x_out, res_exp, u
 
+
 def iter_MI_multipara(p, p_num, para_num, x, x_list, u, rho_all, M, dim, ei, p_shape):
     rho = [np.zeros((dim, dim), dtype=np.complex128) for i in range(p_num)]
     for hj in range(p_num):
-        idx_list = [np.argmin(np.abs(x[i] - (x_list[hj][i] + u[i]))) for i in range(para_num)]
-        x_idx = int(sum([idx_list[i] * np.prod(np.array(p_shape[(i + 1) :])) for i in range(para_num)]))
+        idx_list = [
+            np.argmin(np.abs(x[i] - (x_list[hj][i] + u[i]))) for i in range(para_num)
+        ]
+        x_idx = int(
+            sum(
+                [
+                    idx_list[i] * np.prod(np.array(p_shape[(i + 1) :]))
+                    for i in range(para_num)
+                ]
+            )
+        )
         rho[hj] = rho_all[x_idx]
     print("The tunable parameter are %s" % (u))
     res_exp = input("Please enter the experimental result: ")
@@ -751,16 +911,19 @@ def iter_MI_multipara(p, p_num, para_num, x, x_list, u, rho_all, M, dim, ei, p_s
         arr = simpson(arr, x[si])
     py = arr
     p_update = p * pyx / py
-    
+
     p_lis = np.zeros(p_num)
     p_ext = extract_ele(p_update, para_num)
     p_up_lis = []
     for p_ele in p_ext:
         p_up_lis.append(p_ele)
     for i in range(p_num):
-        res = [x_list[0][ri] < (x_list[i][ri] + u[ri]) < x_list[-1][ri] for ri in range(para_num)]
+        res = [
+            x_list[0][ri] < (x_list[i][ri] + u[ri]) < x_list[-1][ri]
+            for ri in range(para_num)
+        ]
         if all(res):
-            p_lis[i] =  p_up_lis[i]
+            p_lis[i] = p_up_lis[i]
 
     p = p_lis.reshape(p_shape)
 
@@ -772,21 +935,33 @@ def iter_MI_multipara(p, p_num, para_num, x, x_list, u, rho_all, M, dim, ei, p_s
     for ui in range(p_num):
         rho_u = [np.zeros((dim, dim), dtype=np.complex128) for i in range(p_num)]
         for hj in range(p_num):
-            idx_list = [np.argmin(np.abs(x[i] - (x_list[hj][i] + x_list[ui][i]))) for i in range(para_num)]
-            x_idx = int(sum([idx_list[i] * np.prod(np.array(p_shape[(i + 1) :])) for i in range(para_num)]))
+            idx_list = [
+                np.argmin(np.abs(x[i] - (x_list[hj][i] + x_list[ui][i])))
+                for i in range(para_num)
+            ]
+            x_idx = int(
+                sum(
+                    [
+                        idx_list[i] * np.prod(np.array(p_shape[(i + 1) :]))
+                        for i in range(para_num)
+                    ]
+                )
+            )
             rho_u[hj] = rho_all[x_idx]
         value_tp = np.zeros(p_shape)
         for mi in range(len(M)):
-            pyx_list_tp = np.array([np.real(np.trace(np.dot(rho_u[xi], M[mi]))) for xi in range(p_num)])
+            pyx_list_tp = np.array(
+                [np.real(np.trace(np.dot(rho_u[xi], M[mi]))) for xi in range(p_num)]
+            )
             pyx_tp = pyx_list_tp.reshape(p_shape)
             mean_tp = p * pyx_tp
             for si in reversed(range(para_num)):
                 mean_tp = simpson(mean_tp, x[si])
-            value_tp += pyx_tp*np.log2(pyx_tp/mean_tp) 
+            value_tp += pyx_tp * np.log2(pyx_tp / mean_tp)
 
         # value_int = p * value_tp
         # for sj in reversed(range(para_num)):
-        #    value_int = simpson(value_int, x[sj])  
+        #    value_int = simpson(value_int, x[sj])
 
         arr = np.zeros(p_num)
         p_ext = extract_ele(p, para_num)
@@ -796,12 +971,15 @@ def iter_MI_multipara(p, p_num, para_num, x, x_list, u, rho_all, M, dim, ei, p_s
             p_lis.append(p_ele)
             value_lis.append(value_ele)
         for hj in range(p_num):
-            res = [x_list[0][ri] < (x_list[hj][ri] + x_list[ui][ri]) < x_list[-1][ri] for ri in range(para_num)]
+            res = [
+                x_list[0][ri] < (x_list[hj][ri] + x_list[ui][ri]) < x_list[-1][ri]
+                for ri in range(para_num)
+            ]
             if all(res):
-                arr[hj] =  p_lis[hj] * value_lis[hj]
+                arr[hj] = p_lis[hj] * value_lis[hj]
         value_int = arr.reshape(p_shape)
         for sj in reversed(range(para_num)):
-           value_int = simpson(value_int, x[sj])     
+            value_int = simpson(value_int, x[sj])
 
         MI[ui] = value_int
     p_idx = np.unravel_index(MI.argmax(), p.shape)
@@ -813,34 +991,36 @@ def iter_MI_multipara(p, p_num, para_num, x, x_list, u, rho_all, M, dim, ei, p_s
                 raise ValueError("please increase the regime of the parameters.")
     return p, x_out, res_exp, u
 
+
 def savefile_true(p, xout, y):
-    fp = open('pout.csv','a')
-    fp.write('\n')
+    fp = open("pout.csv", "a")
+    fp.write("\n")
     np.savetxt(fp, p)
     fp.close()
 
-    fx = open('xout.csv','a')
-    fx.write('\n')
+    fx = open("xout.csv", "a")
+    fx.write("\n")
     np.savetxt(fx, [xout])
     fx.close()
 
-    fy = open('y.csv','a')
-    fy.write('\n')
+    fy = open("y.csv", "a")
+    fy.write("\n")
     np.savetxt(fy, [y])
     fy.close()
 
+
 def savefile_false(p, xout, y):
-    fp = open('pout.csv','a')
-    fp.write('\n')
+    fp = open("pout.csv", "a")
+    fp.write("\n")
     np.savetxt(fp, np.array(p))
     fp.close()
 
-    fx = open('xout.csv','a')
-    fx.write('\n')
+    fx = open("xout.csv", "a")
+    fx.write("\n")
     np.savetxt(fx, np.array(xout))
     fx.close()
 
-    fy = open('y.csv','a')
-    fy.write('\n')
+    fy = open("y.csv", "a")
+    fy.write("\n")
     np.savetxt(fy, np.array(y))
     fy.close()

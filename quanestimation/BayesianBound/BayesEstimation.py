@@ -7,9 +7,9 @@ from itertools import product
 
 def Bayes(x, p, rho, y, M=None, estimator="mean", savefile=False):
     """
-    Bayesian estimation. The prior distribution is updated via the posterior 
-    distribution obtained by Bayes' rule. The estimated value of parameters are 
-    updated via either the expectation value of the distribution or maximum a 
+    Bayesian estimation. The prior distribution is updated via the posterior
+    distribution obtained by Bayes' rule. The estimated value of parameters are
+    updated via either the expectation value of the distribution or maximum a
     posteriori probability (MAP).
 
     Args:
@@ -17,68 +17,68 @@ def Bayes(x, p, rho, y, M=None, estimator="mean", savefile=False):
         p (np.ndarray): The prior distribution as a multidimensional array.
         rho (list): Parameterized density matrix as a multidimensional list.
         y (np.ndarray): The experimental results obtained in practice.
-        M (list, optional): A set of positive operator-valued measure (POVM). 
-            Defaults to a set of rank-one symmetric informationally complete 
+        M (list, optional): A set of positive operator-valued measure (POVM).
+            Defaults to a set of rank-one symmetric informationally complete
             POVM (SIC-POVM).
-        estimator (str, optional): Estimators for the bayesian estimation. 
+        estimator (str, optional): Estimators for the bayesian estimation.
             Options are:
                 "mean" (default) - The expectation value of the distribution.
                 "MAP" - Maximum a posteriori probability.
-        savefile (bool, optional): Whether to save all posterior distributions. 
-            If True, generates "pout.npy" and "xout.npy" containing all 
-            posterior distributions and estimated values across iterations. 
-            If False, only saves the final posterior distribution and all 
+        savefile (bool, optional): Whether to save all posterior distributions.
+            If True, generates "pout.npy" and "xout.npy" containing all
+            posterior distributions and estimated values across iterations.
+            If False, only saves the final posterior distribution and all
             estimated values. Defaults to False.
 
     Returns:
-        (tuple): 
-            pout (np.ndarray): 
+        (tuple):
+            pout (np.ndarray):
                 The posterior distribution in the final iteration.
 
-            xout (float/list): 
+            xout (float/list):
                 The estimated values in the final iteration.
 
     Raises:
-        TypeError: 
+        TypeError:
             If `M` is not a list.
-        ValueError: 
+        ValueError:
             If estimator is not "mean" or "MAP".
 
-    Note: 
-        SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state 
+    Note:
+        SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state
         which can be downloaded from [here](http://www.physics.umb.edu/Research/QBism/solutions.html).
     """
     if M is None:
         M = []
-        
+
     para_num = len(x)
     max_episode = len(y)
-    
+
     # Single parameter scenario
     if para_num == 1:
         if not M:
             M = SIC(len(rho[0]))
         elif not isinstance(M, list):
             raise TypeError("M must be a list")
-            
+
         x_out = []
         p_out = []
-        
+
         for mi in range(max_episode):
             res_exp = int(y[mi])
             pyx = np.zeros(len(x[0]))
-            
+
             # Calculate conditional probabilities
             for xi in range(len(x[0])):
                 p_tp = np.real(np.trace(rho[xi] @ M[res_exp]))
                 pyx[xi] = p_tp
-                
+
             # Update posterior distribution
             arr = [pyx[m] * p[m] for m in range(len(x[0]))]
             py = simpson(arr, x[0])
             p_update = pyx * p / py
             p = p_update / np.linalg.norm(p_update)
-            
+
             # Handle estimator type
             if estimator == "mean":
                 mean = simpson([p[m] * x[0][m] for m in range(len(x[0]))], x[0])
@@ -88,14 +88,15 @@ def Bayes(x, p, rho, y, M=None, estimator="mean", savefile=False):
                 x_out.append(x[0][indx])
             else:
                 raise ValueError(
-                    "Invalid estimator: {}. Supported values are 'mean' and 'MAP'"
-                    .format(estimator)
+                    "Invalid estimator: {}. Supported values are 'mean' and 'MAP'".format(
+                        estimator
+                    )
                 )
-                
+
             # Save intermediate results if requested
             if savefile:
                 p_out.append(p)
-                
+
         # Save final results
         if savefile:
             np.save("pout", p_out)
@@ -105,7 +106,7 @@ def Bayes(x, p, rho, y, M=None, estimator="mean", savefile=False):
             np.save("pout", p)
             np.save("xout", x_out)
             return p, x_out[-1]
-            
+
     # Multiparameter scenario
     else:
         p_shape = np.shape(p)
@@ -122,19 +123,19 @@ def Bayes(x, p, rho, y, M=None, estimator="mean", savefile=False):
             M = SIC(dim)
         elif not isinstance(M, list):
             raise TypeError("M must be a list")
-            
+
         x_out = []
         p_out = []  # Always initialize as list
-        
+
         for mi in range(max_episode):
             res_exp = int(y[mi])
             pyx_list = np.zeros(len(p_list))
-            
+
             # Calculate conditional probabilities
             for xi in range(len(p_list)):
                 p_tp = np.real(np.trace(rho_list[xi] @ M[res_exp]))
                 pyx_list[xi] = p_tp
-                
+
             # Reshape and update posterior distribution
             pyx = pyx_list.reshape(p_shape)
             arr = p * pyx
@@ -143,7 +144,7 @@ def Bayes(x, p, rho, y, M=None, estimator="mean", savefile=False):
             py = arr
             p_update = p * pyx / py
             p = p_update / np.linalg.norm(p_update)
-            
+
             # Handle estimator type
             if estimator == "mean":
                 mean = integ(x, p)
@@ -157,11 +158,11 @@ def Bayes(x, p, rho, y, M=None, estimator="mean", savefile=False):
                 raise ValueError(
                     f"Invalid estimator: {estimator}. Supported values are 'mean' and 'MAP'"
                 )
-                
+
             # Save intermediate results if requested
             if savefile:
                 p_out.append(p)
-                
+
         # Save final results
         if savefile:
             np.save("pout", p_out)
@@ -178,34 +179,34 @@ def MLE(x, rho, y, M=[], savefile=False):
     Maximum likelihood estimation (MLE) for parameter estimation.
 
     Args:
-        x (list): 
+        x (list):
             The regimes of the parameters for the integral.
-        rho (list): 
+        rho (list):
             Parameterized density matrix as a multidimensional list.
-        y (np.ndarray): 
+        y (np.ndarray):
             The experimental results obtained in practice.
-        M (list, optional): 
-            A set of positive operator-valued measure (POVM). Defaults to a set of rank-one 
+        M (list, optional):
+            A set of positive operator-valued measure (POVM). Defaults to a set of rank-one
             symmetric informationally complete POVM (SIC-POVM).
-        savefile (bool, optional): 
-            Whether to save all likelihood functions. If True, generates "Lout.npy" and 
-            "xout.npy" containing all likelihood functions and estimated values across 
-            iterations. If False, only saves the final likelihood function and all 
+        savefile (bool, optional):
+            Whether to save all likelihood functions. If True, generates "Lout.npy" and
+            "xout.npy" containing all likelihood functions and estimated values across
+            iterations. If False, only saves the final likelihood function and all
             estimated values. Defaults to False.
 
     Returns:
-        (tuple): 
-            Lout (np.ndarray): 
+        (tuple):
+            Lout (np.ndarray):
                 The likelihood function in the final iteration.
 
-            xout (float/list): 
+            xout (float/list):
                 The estimated values in the final iteration.
 
     Raises:
         TypeError: If `M` is not a list.
 
-    Note: 
-        SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state 
+    Note:
+        SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state
         which can be downloaded from [here](http://www.physics.umb.edu/Research/QBism/solutions.html).
     """
     if M is None:
@@ -300,62 +301,64 @@ def MLE(x, rho, y, M=[], savefile=False):
             np.save("xout", x_out)
             return L_tp, x_out[-1]
 
+
 def integ(x, p):
     """
     Compute the mean for each parameter by integrating over the other parameters.
-    
+
     Args:
         x: List of arrays, the parameter ranges
         p: Multidimensional array, the probability distribution
-        
+
     Returns:
         List of mean values for each parameter
     """
     para_num = len(x)
     mean = []
-    
+
     for i in range(para_num):
         # Create a list of axes to integrate over (all except current axis i)
         axes = [j for j in range(para_num) if j != i]
-        
+
         # Integrate over all other axes to get marginal distribution for axis i
         p_marginal = p
         for axis in sorted(axes, reverse=True):
             p_marginal = simpson(p_marginal, x[axis], axis=axis)
-            
+
         # Compute mean for current parameter
         mean_val = simpson(x[i] * p_marginal, x[i])
         mean.append(mean_val)
-        
+
     return mean
+
 
 def BayesCost(x, p, xest, rho, M, W=[], eps=1e-8):
     """
     Calculation of the average Bayesian cost with a quadratic cost function.
 
     Args:
-        x (list): 
+        x (list):
             The regimes of the parameters for the integral.
-        p (array): 
+        p (array):
             The prior distribution as a multidimensional array.
-        xest (float or list): 
+        xest (float or list):
             The estimators. xest is a float for single-parameter estimation
             and a list for multi-parameter estimation.
-        rho (list): 
+        rho (list):
             Parameterized density matrix as a multidimensional list.
-        M (list): 
+        M (list):
             A set of positive operator-valued measure (POVM).
-        W (array, optional): 
+        W (array, optional):
             Weight matrix. Defaults to an identity matrix.
-        eps (float, optional): 
+        eps (float, optional):
             Machine epsilon.
 
     Returns:
-        (float): 
+        (float):
             The average Bayesian cost.
 
     Raises:
-        TypeError: 
+        TypeError:
             If `M` is not a list.
     """
     if M is None:
@@ -372,13 +375,22 @@ def BayesCost(x, p, xest, rho, M, W=[], eps=1e-8):
         else:
             if type(M) != list:
                 raise TypeError("Please make sure M is a list!")
-            
+
         # if isinstance(x, np.ndarray):
-        #     x = [x]    
+        #     x = [x]
 
         p_num = len(x[0])
 
-        value = [p[i]*sum([np.trace(rho[i] @ M[mi])*(x[0][i]-xest)**2 for mi in range(len(M))]) for i in range(p_num)]
+        value = [
+            p[i]
+            * sum(
+                [
+                    np.trace(rho[i] @ M[mi]) * (x[0][i] - xest) ** 2
+                    for mi in range(len(M))
+                ]
+            )
+            for i in range(p_num)
+        ]
         C = simpson(value, x[0])
         return np.real(C)
     else:
@@ -396,13 +408,13 @@ def BayesCost(x, p, xest, rho, M, W=[], eps=1e-8):
         x_list = []
         for x_ele in x_pro:
             x_list.append([x_ele[i] for i in range(para_num)])
-            
+
         dim = len(rho_list[0])
         p_num = len(p_list)
-        
+
         if W == []:
             W = np.identity(para_num)
-            
+
         if M == []:
             M = SIC(dim)
         else:
@@ -414,32 +426,38 @@ def BayesCost(x, p, xest, rho, M, W=[], eps=1e-8):
             x_tp = np.array(x_list[i])
             xCx = 0.0
             for mi in range(len(M)):
-                xCx += np.trace(rho_list[i] @ M[mi])*np.dot((x_tp-xest[mi]).reshape(1, -1), W @ (x_tp-xest[mi]).reshape(-1, 1))[0][0]
-            value[i] = p_list[i]*xCx
+                xCx += (
+                    np.trace(rho_list[i] @ M[mi])
+                    * np.dot(
+                        (x_tp - xest[mi]).reshape(1, -1),
+                        W @ (x_tp - xest[mi]).reshape(-1, 1),
+                    )[0][0]
+                )
+            value[i] = p_list[i] * xCx
         C = np.array(value).reshape(p_shape)
         for si in reversed(range(para_num)):
             C = simpson(C, x[si])
         return np.real(C)
-    
-    
+
+
 def BCB(x, p, rho, W=[], eps=1e-8):
     """
     Calculation of the Bayesian cost bound with a quadratic cost function.
 
     Args:
-        x (list): 
+        x (list):
             The regimes of the parameters for the integral.
-        p (array): 
+        p (array):
             The prior distribution as a multidimensional array.
-        rho (list): 
+        rho (list):
             Parameterized density matrix as a multidimensional list.
-        W (array, optional): 
+        W (array, optional):
             Weight matrix. Defaults to an identity matrix.
-        eps (float, optional): 
+        eps (float, optional):
             Machine epsilon. Defaults to 1e-8.
 
     Returns:
-        (float): 
+        (float):
             The value of the minimum Bayesian cost.
 
     Note:
@@ -450,14 +468,14 @@ def BCB(x, p, rho, W=[], eps=1e-8):
         # single-parameter scenario
         dim = len(rho[0])
         p_num = len(x[0])
-        value = [p[i]*x[0][i]**2 for i in range(p_num)]
+        value = [p[i] * x[0][i] ** 2 for i in range(p_num)]
         delta2_x = simpson(value, x[0])
         rho_avg = np.zeros((dim, dim), dtype=np.complex128)
         rho_pri = np.zeros((dim, dim), dtype=np.complex128)
         for di in range(dim):
             for dj in range(dim):
-                rho_avg_arr = [p[m]*rho[m][di][dj] for m in range(p_num)]
-                rho_pri_arr = [p[n]*x[0][n]*rho[n][di][dj] for n in range(p_num)]
+                rho_avg_arr = [p[m] * rho[m][di][dj] for m in range(p_num)]
+                rho_pri_arr = [p[n] * x[0][n] * rho[n][di][dj] for n in range(p_num)]
                 rho_avg[di][dj] = simpson(rho_avg_arr, x[0])
                 rho_pri[di][dj] = simpson(rho_pri_arr, x[0])
         Lambda = Lambda_avg(rho_avg, [rho_pri], eps=eps)
@@ -481,15 +499,15 @@ def BCB(x, p, rho, W=[], eps=1e-8):
         x_list = []
         for x_ele in x_pro:
             x_list.append([x_ele[i] for i in range(para_num)])
-        
+
         if W == []:
             W = np.identity(para_num)
-        
+
         value = [0.0 for i in range(p_num)]
         for i in range(p_num):
             x_tp = np.array(x_list[i])
             xCx = np.dot(x_tp.reshape(1, -1), np.dot(W, x_tp.reshape(-1, 1)))[0][0]
-            value[i] = p_list[i]*xCx
+            value[i] = p_list[i] * xCx
         delta2_x = np.array(value).reshape(p_shape)
         for si in reversed(range(para_num)):
             delta2_x = simpson(delta2_x, x[si])
@@ -497,14 +515,17 @@ def BCB(x, p, rho, W=[], eps=1e-8):
         rho_pri = [np.zeros((dim, dim), dtype=np.complex128) for i in range(para_num)]
         for di in range(dim):
             for dj in range(dim):
-                rho_avg_arr = [p_list[m]*rho_list[m][di][dj] for m in range(p_num)]
+                rho_avg_arr = [p_list[m] * rho_list[m][di][dj] for m in range(p_num)]
                 rho_avg_tp = np.array(rho_avg_arr).reshape(p_shape)
                 for si in reversed(range(para_num)):
                     rho_avg_tp = simpson(rho_avg_tp, x[si])
                 rho_avg[di][dj] = rho_avg_tp
 
                 for para_i in range(para_num):
-                    rho_pri_arr = [p_list[n]*x_list[n][para_i]*rho_list[n][di][dj] for n in range(p_num)]
+                    rho_pri_arr = [
+                        p_list[n] * x_list[n][para_i] * rho_list[n][di][dj]
+                        for n in range(p_num)
+                    ]
                     rho_pri_tp = np.array(rho_pri_arr).reshape(p_shape)
                     for si in reversed(range(para_num)):
                         rho_pri_tp = simpson(rho_pri_tp, x[si])
@@ -515,10 +536,11 @@ def BCB(x, p, rho, W=[], eps=1e-8):
         for para_m in range(para_num):
             for para_n in range(para_num):
                 Mat += W[para_m][para_n] * np.dot(Lambda[para_m], Lambda[para_n])
-                
-        minBC = delta2_x-np.real(np.trace(rho_avg @ Mat))
+
+        minBC = delta2_x - np.real(np.trace(rho_avg @ Mat))
         return minBC
-        
+
+
 def Lambda_avg(rho_avg, rho_pri, eps=1e-8):
     para_num = len(rho_pri)
     dim = len(rho_avg)
@@ -526,11 +548,17 @@ def Lambda_avg(rho_avg, rho_pri, eps=1e-8):
     val, vec = np.linalg.eig(rho_avg)
     val = np.real(val)
     for para_i in range(0, para_num):
-        Lambda_eig = np.array([[0.0 + 0.0 * 1.0j for i in range(0, dim)] for i in range(0, dim)])
+        Lambda_eig = np.array(
+            [[0.0 + 0.0 * 1.0j for i in range(0, dim)] for i in range(0, dim)]
+        )
         for fi in range(0, dim):
             for fj in range(0, dim):
                 if np.abs(val[fi] + val[fj]) > eps:
-                    Lambda_eig[fi][fj] = 2* (vec[:, fi].conj().transpose() @ rho_pri[para_i]@ vec[:, fj]) / (val[fi] + val[fj])
+                    Lambda_eig[fi][fj] = (
+                        2
+                        * (vec[:, fi].conj().transpose() @ rho_pri[para_i] @ vec[:, fj])
+                        / (val[fi] + val[fj])
+                    )
         Lambda_eig[Lambda_eig == np.inf] = 0.0
-        Lambda[para_i] =  vec @ Lambda_eig @ vec.conj().transpose()
+        Lambda[para_i] = vec @ Lambda_eig @ vec.conj().transpose()
     return Lambda

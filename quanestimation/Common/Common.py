@@ -11,7 +11,7 @@ from scipy.linalg import sqrtm
 def load_julia():
     """
     Load Julia and initialize QuanEstimation module.
-    
+
     Returns:
         jl.Main.QuanEstimation: Julia module for quantum estimation
     """
@@ -23,13 +23,13 @@ def load_julia():
 def mat_vec_convert(A):
     """
     Convert between matrix and vector representations.
-    
+
     Args:
-        A (np.array): 
-            Input matrix or vector. 
-        
+        A (np.array):
+            Input matrix or vector.
+
     Returns:
-        (np.array): 
+        (np.array):
             Converted matrix or vector.
     """
     if A.shape[1] == 1:
@@ -42,38 +42,29 @@ def mat_vec_convert(A):
 def suN_unsorted(n):
     """
     Generate unsorted SU(N) generators.
-    
+
     Args:
-        n (float): 
+        n (float):
             Dimension of the system.
-        
+
     Returns:
-        (tuple): 
+        (tuple):
             Tuple of symmetric, antisymmetric, and diagonal generators.
     """
     U, V, W = [], [], []
     for i in range(1, n):
         for j in range(0, i):
-            U_tp = csc_matrix(
-                ([1.0, 1.0], ([i, j], [j, i])), 
-                shape=(n, n)
-            ).toarray()
-            V_tp = csc_matrix(
-                ([1.0j, -1.0j], ([i, j], [j, i])), 
-                shape=(n, n)
-            ).toarray()
+            U_tp = csc_matrix(([1.0, 1.0], ([i, j], [j, i])), shape=(n, n)).toarray()
+            V_tp = csc_matrix(([1.0j, -1.0j], ([i, j], [j, i])), shape=(n, n)).toarray()
             U.append(U_tp)
             V.append(V_tp)
 
     diag = []
     for i in range(n - 1):
-        mat_tp = csc_matrix(
-            ([1, -1], ([i, i + 1], [i, i + 1])), 
-            shape=(n, n)
-        ).toarray()
+        mat_tp = csc_matrix(([1, -1], ([i, i + 1], [i, i + 1])), shape=(n, n)).toarray()
         diag_tp = np.diagonal(mat_tp)
         diag.append(Matrix(diag_tp))
-        
+
     W_gs = GramSchmidt(diag, True)
     for k in range(len(W_gs)):
         W_tp = np.fromiter(W_gs[k], dtype=complex)
@@ -85,13 +76,13 @@ def suN_unsorted(n):
 def suN_generator(n):
     """
     Generate sorted SU(N) generators.
-    
+
     Args:
-        n (float): 
-            Dimension of the system. 
-        
+        n (float):
+            Dimension of the system.
+
     Returns:
-        (list): 
+        (list):
             List of SU(N) generators.
     """
     symm, anti_symm, diag = suN_unsorted(n)
@@ -132,13 +123,13 @@ def suN_generator(n):
 def gramschmidt(A):
     """
     Perform Gram-Schmidt orthogonalization.
-    
+
     Args:
-        A (list): 
+        A (list):
             List of vectors to orthogonalize.
-        
+
     Returns:
-        (list): 
+        (list):
             List of orthonormal vectors.
     """
     dim = len(A)
@@ -157,15 +148,15 @@ def gramschmidt(A):
 def basis(dim, index):
     """
     Generate basis vector.
-    
+
     Args:
-        dim (float): 
+        dim (float):
             Dimension of Hilbert space.
-        index (float): 
+        index (float):
             Index of basis vector.
-        
+
     Returns:
-        (np.array): 
+        (np.array):
             Basis vector as column vector.
     """
     x = np.zeros(dim)
@@ -176,13 +167,13 @@ def basis(dim, index):
 def sic_povm(fiducial):
     """
     Generate SIC-POVM from fiducial state.
-    
+
     Args:
-        fiducial (np.array): 
+        fiducial (np.array):
             the fiducial state vector.
-        
+
     Returns:
-        (list): 
+        (list):
             List of POVM elements.
     """
     d = fiducial.shape[0]
@@ -218,17 +209,17 @@ def sic_povm(fiducial):
 def SIC(dim):
     """
     Generate SIC-POVM for given dimension.
-    
+
     Args:
-        dim (float): 
+        dim (float):
             Dimension of the system.
-        
+
     Returns:
-        (list): 
+        (list):
             List of SIC-POVM elements.
-        
+
     Raises:
-        ValueError: 
+        ValueError:
             If dimension > 151.
     """
     if dim <= 151:
@@ -242,19 +233,17 @@ def SIC(dim):
         M = sic_povm(fiducial)
         return M
     else:
-        raise ValueError(
-            "The dimension of the space should be less or equal to 151."
-        )
+        raise ValueError("The dimension of the space should be less or equal to 151.")
 
 
 def extract_ele(element, n):
     """
     Recursively extract elements.
-    
+
     Args:
-        element (np.array/list): 
+        element (np.array/list):
             Input element
-        n (int/float): 
+        n (int/float):
             Depth of extraction.
     """
     if n:
@@ -267,13 +256,13 @@ def extract_ele(element, n):
 def annihilation(n):
     """
     Create annihilation operator.
-    
+
     Args:
-        n (int/float): 
+        n (int/float):
             Dimension of space.
-        
+
     Returns:
-        (np.array): 
+        (np.array):
             Annihilation operator matrix.
     """
     data = np.sqrt(np.arange(1, n, dtype=complex))
@@ -287,13 +276,13 @@ def annihilation(n):
 def brgd(n):
     """
     Generate binary reflected Gray code.
-    
+
     Args:
-        n (int/float): 
+        n (int/float):
             Number of bits
-        
+
     Returns:
-        (list): 
+        (list):
             List of Gray code sequences
     """
     if n == 1:
@@ -310,23 +299,23 @@ def brgd(n):
 def BayesInput(x, func, dfunc, channel="dynamics"):
     """
     Generate input variables for Bayesian estimation.
-    
+
     Args:
-        x (np.array): 
+        x (np.array):
             Parameter regimes
-        func (callable): 
+        func (callable):
             Function returning H or K
-        dfunc (callable): 
+        dfunc (callable):
             Function returning dH or dK
-        channel (str, optional): 
+        channel (str, optional):
             "dynamics" or "Kraus" (default: "dynamics")
-        
+
     Returns:
-        (tuple): 
+        (tuple):
             Tuple of (H_list, dH_list) or (K_list, dK_list)
-        
+
     Raises:
-        ValueError: 
+        ValueError:
             For invalid channel.
     """
     x_all = product(*x)
@@ -348,20 +337,21 @@ def BayesInput(x, func, dfunc, channel="dynamics"):
             "'dynamics' or 'Kraus'.".format(channel)
         )
 
+
 def fidelity(input1, input2):
     """
     Compute the fidelity between two quantum states.
-    
+
     For state vectors (1D arrays), the fidelity is defined as |<ψ|φ>|².
     For density matrices (2D arrays), the fidelity is defined as [tr(√(√ρ σ √ρ))]².
-    
+
     Args:
         input1 (np.ndarray): First quantum state (vector or density matrix)
         input2 (np.ndarray): Second quantum state (vector or density matrix)
-        
+
     Returns:
         float: Fidelity between the two states
-        
+
     Raises:
         TypeError: If inputs are not numpy arrays
         ValueError: If inputs are not both vectors or both matrices
@@ -369,19 +359,19 @@ def fidelity(input1, input2):
     """
     if not (isinstance(input1, np.ndarray) and isinstance(input2, np.ndarray)):
         raise TypeError("Inputs must be numpy arrays")
-    
+
     if input1.ndim == 1 and input2.ndim == 1:
         # Vector case
         overlap = np.vdot(input1, input2)
         return np.abs(overlap) ** 2
-    
+
     elif input1.ndim != 1:
         # Matrix case
         if input1.shape != input2.shape:
             raise ValueError("Input matrices must have the same shape")
-        
+
         rho_sqrt = sqrtm(input1)
-        product = rho_sqrt @ input2 @ rho_sqrt            
+        product = rho_sqrt @ input2 @ rho_sqrt
         fidelity_sqrt = np.trace(sqrtm(product))
 
         return np.real(fidelity_sqrt) ** 2
