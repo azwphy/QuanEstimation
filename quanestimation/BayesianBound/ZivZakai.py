@@ -9,8 +9,10 @@ def trace_norm(A, eps):
     else:
         return np.sum(np.linalg.svd(A, compute_uv=False))
 
+
 def helstrom_dm(rho, sigma, eps, P0=0.5):
     return np.real((1 - trace_norm(P0 * rho - (1 - P0) * sigma, eps)) / 2)
+
 
 # def helstrom_vec(psi, phi, n=1):
 #     return np.real((1 - np.sqrt(1 - fidelity(psi, phi) ** n)) / 2)

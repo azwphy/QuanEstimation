@@ -7,11 +7,11 @@ class DDPG_Sopt(State.StateSystem):
     Attributes
     ----------
     > **savefile:**  `bool`
-        -- Whether or not to save all the states.  
-        If set `True` then the states and the values of the 
-        objective function obtained in all episodes will be saved during 
-        the training. If set `False` the state in the final 
-        episode and the values of the objective function in all episodes 
+        -- Whether or not to save all the states.
+        If set `True` then the states and the values of the
+        objective function obtained in all episodes will be saved during
+        the training. If set `False` the state in the final
+        episode and the values of the objective function in all episodes
         will be saved.
 
     > **psi0:** `list of arrays`
@@ -19,7 +19,7 @@ class DDPG_Sopt(State.StateSystem):
 
     > **max_episode:** `int`
         -- The number of episodes.
-  
+
     > **layer_num:** `int`
         -- The number of layers (include the input and output layer).
 
@@ -33,7 +33,7 @@ class DDPG_Sopt(State.StateSystem):
         -- Machine epsilon.
 
     > **load:** `bool`
-        -- Whether or not to load states in the current location.  
+        -- Whether or not to load states in the current location.
         If set `True` then the program will load state from "states.csv"
         file in the current location and use it as the initial state.
     """
@@ -49,7 +49,6 @@ class DDPG_Sopt(State.StateSystem):
         eps=1e-8,
         load=False,
     ):
-
         State.StateSystem.__init__(self, savefile, psi0, seed, eps, load)
 
         self.max_episode = max_episode
@@ -58,14 +57,12 @@ class DDPG_Sopt(State.StateSystem):
 
         self.seed = seed
 
-        self.alg = QJL.DDPG(
-            self.max_episode, self.layer_num, self.layer_dim, self.seed
-        )
+        self.alg = QJL.DDPG(self.max_episode, self.layer_num, self.layer_dim, self.seed)
 
     def QFIM(self, W=[], LDtype="SLD"):
         r"""
-        Choose QFI or $\mathrm{Tr}(WF^{-1})$ as the objective function. 
-        In single parameter estimation the objective function is QFI and in 
+        Choose QFI or $\mathrm{Tr}(WF^{-1})$ as the objective function.
+        In single parameter estimation the objective function is QFI and in
         multiparameter estimation it will be $\mathrm{Tr}(WF^{-1})$.
 
         Parameters
@@ -74,9 +71,9 @@ class DDPG_Sopt(State.StateSystem):
             -- Weight matrix.
 
         > **LDtype:** `string`
-            -- Types of QFI (QFIM) can be set as the objective function. Options are:  
-            "SLD" (default) -- QFI (QFIM) based on symmetric logarithmic derivative (SLD).  
-            "RLD" -- QFI (QFIM) based on right logarithmic derivative (RLD).  
+            -- Types of QFI (QFIM) can be set as the objective function. Options are:
+            "SLD" (default) -- QFI (QFIM) based on symmetric logarithmic derivative (SLD).
+            "RLD" -- QFI (QFIM) based on right logarithmic derivative (RLD).
             "LLD" -- QFI (QFIM) based on left logarithmic derivative (LLD).
         """
 
@@ -84,8 +81,8 @@ class DDPG_Sopt(State.StateSystem):
 
     def CFIM(self, M=[], W=[]):
         r"""
-        Choose CFI or $\mathrm{Tr}(WI^{-1})$ as the objective function. 
-        In single parameter estimation the objective function is CFI and 
+        Choose CFI or $\mathrm{Tr}(WI^{-1})$ as the objective function.
+        In single parameter estimation the objective function is CFI and
         in multiparameter estimation it will be $\mathrm{Tr}(WI^{-1})$.
 
         Parameters
@@ -94,11 +91,11 @@ class DDPG_Sopt(State.StateSystem):
             -- Weight matrix.
 
         > **M:** `list of matrices`
-            -- A set of positive operator-valued measure (POVM). The default measurement 
+            -- A set of positive operator-valued measure (POVM). The default measurement
             is a set of rank-one symmetric informationally complete POVM (SIC-POVM).
 
-        **Note:** 
-            SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state 
+        **Note:**
+            SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state
             which can be downloaded from [here](http://www.physics.umb.edu/Research/QBism/
             solutions.html).
         """
@@ -107,9 +104,9 @@ class DDPG_Sopt(State.StateSystem):
 
     def HCRB(self, W=[]):
         """
-        Choose HCRB as the objective function. 
+        Choose HCRB as the objective function.
 
-        **Note:** in single parameter estimation, HCRB is equivalent to QFI, please choose 
+        **Note:** in single parameter estimation, HCRB is equivalent to QFI, please choose
         QFI as the objective function.
 
         Parameters
