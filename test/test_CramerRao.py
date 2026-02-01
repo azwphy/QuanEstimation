@@ -30,8 +30,8 @@ def test_CramerRao_SLD() -> None:
     # State derivatives
     drho = [
         np.array([
-            [-np.sin(2 * theta), 2 * np.cos(2 * theta) * np.exp(-1j * phi)],
-            [2 * np.cos(2 * theta) * np.exp(1j * phi), np.sin(2 * theta)]
+            [-np.sin(2 * theta), np.cos(2 * theta) * np.exp(-1j * phi)],
+            [np.cos(2 * theta) * np.exp(1j * phi), np.sin(2 * theta)]
         ]),
         np.array([
             [0, -1j * np.cos(theta) * np.sin(theta) * np.exp(-1j * phi)],
@@ -81,8 +81,8 @@ def test_CFIM_singleparameter() -> None:
     
     # State derivative
     drho = [np.array([
-        [-np.sin(2 * theta), 2 * np.cos(2 * theta)],
-        [2 * np.cos(2 * theta), np.sin(2 * theta)]
+        [-np.sin(2 * theta), np.cos(2 * theta)],
+        [np.cos(2 * theta), np.sin(2 * theta)]
     ])]
     
     # Calculate CFIM
