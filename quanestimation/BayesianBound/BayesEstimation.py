@@ -3,6 +3,7 @@ from scipy.integrate import simpson
 from quanestimation.Common.Common import extract_ele
 from quanestimation.Common.Common import SIC
 from itertools import product
+import math
 
 
 def Bayes(x, p, rho, y, M=None, estimator="mean", savefile=False):
@@ -228,7 +229,7 @@ def MLE(x, rho, y, M=[], savefile=False):
                 res_exp = int(y[mi])
                 for xi in range(len(x[0])):
                     p_tp = np.real(np.trace(rho[xi] @ M[res_exp]))
-                    L_out[xi] = L_out[xi] * p_tp
+                    L_out[xi] += math.log(p_tp + 1e-16)
                 indx = np.where(L_out == max(L_out))[0][0]
                 x_out.append(x[0][indx])
             np.save("Lout", L_out)
@@ -242,7 +243,7 @@ def MLE(x, rho, y, M=[], savefile=False):
                 res_exp = int(y[mi])
                 for xi in range(len(x[0])):
                     p_tp = np.real(np.trace(rho[xi] @ M[res_exp]))
-                    L_tp[xi] = L_tp[xi] * p_tp
+                    L_tp[xi] += math.log(p_tp + 1e-16)
                 indx = np.where(L_tp == max(L_tp))[0][0]
                 L_out.append(L_tp)
                 x_out.append(x[0][indx])
@@ -275,7 +276,7 @@ def MLE(x, rho, y, M=[], savefile=False):
                 res_exp = int(y[mi])
                 for xi in range(len(rho_list)):
                     p_tp = np.real(np.trace(rho_list[xi] @ M[res_exp]))
-                    L_list[xi] = L_list[xi] * p_tp
+                    L_list[xi] += math.log(p_tp + 1e-16)
                 L_out = L_list.reshape(p_shape)
                 indx = np.where(L_out == np.max(L_out))
                 x_out.append([x[i][indx[i][0]] for i in range(para_num)])
@@ -290,7 +291,7 @@ def MLE(x, rho, y, M=[], savefile=False):
                 res_exp = int(y[mi])
                 for xi in range(len(rho_list)):
                     p_tp = np.real(np.trace(rho_list[xi] @ M[res_exp]))
-                    L_list[xi] = L_list[xi] * p_tp
+                    L_list[xi] += math.log(p_tp + 1e-16)
                 L_tp = L_list.reshape(p_shape)
                 indx = np.where(L_tp == np.max(L_tp))
                 L_out.append(L_tp)
