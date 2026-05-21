@@ -401,7 +401,7 @@ class ControlSystem:
                         "Program terminated. In the single-parameter scenario, the HCRB is equivalent to the QFI. Please choose 'QFIM' as the objective function.")
                 self.obj = QJL.HCRB_obj(W=self.W, eps=self.eps)
             elif target == "QFIM" or (
-                LDtype == "SLD" and LDtype == "LLD" and LDtype == "RLD"
+                LDtype == "SLD" or LDtype == "RLD" or LDtype == "LLD"
             ):
                 self.obj = QJL.QFIM_obj(W=self.W, eps=self.eps, LDtype=LDtype)
             else:
