@@ -227,24 +227,23 @@ class StateSystem:
 
         self.opt = QJL.StateOpt(psi=self.psi0, seed=self.seed)
         if any(self.gamma):
-            self.dynamic = QJL.Lindblad(
+            decay = [(self.decay_opt[i], self.gamma[i]) for i in range(len(self.decay_opt))]
+            dynamics = QJL.Lindblad(
                 self.freeHamiltonian,
                 self.Hamiltonian_derivative,
-                list(self.psi0),
                 self.tspan,
-                self.decay_opt,
-                self.gamma,
-                dyn_method = self.dyn_method,
+                decay=decay,
+                dyn_method=self.dyn_method,
             )
         else:
-            self.dynamic = QJL.Lindblad(
+            dynamics = QJL.Lindblad(
                 self.freeHamiltonian,
                 self.Hamiltonian_derivative,
-                list(self.psi0),
                 self.tspan,
-                dyn_method = self.dyn_method,
+                dyn_method=self.dyn_method,
             )
-        self.output = QJL.Output(self.opt, save=self.savefile)
+        scheme = QJL.GeneralScheme(probe=self.psi0, param=dynamics)
+        self.scheme = scheme
 
         self.dynamics_type = "dynamics"
         if len(self.Hamiltonian_derivative) == 1:
@@ -296,8 +295,9 @@ class StateSystem:
             self.psi = [np.array(psi, dtype=np.complex128) for psi in self.psi]
 
         self.opt = QJL.StateOpt(psi=self.psi0, seed=self.seed)
-        self.dynamic = QJL.Kraus(list(self.psi0), self.K, self.dK)
-        self.output = QJL.Output(self.opt, save=self.savefile)
+        dynamics = QJL.Kraus(self.K, self.dK)
+        scheme = QJL.GeneralScheme(probe=self.psi0, param=dynamics)
+        self.scheme = scheme
 
         self.dynamics_type = "Kraus"
         if para_num == 1:
@@ -342,13 +342,8 @@ class StateSystem:
         else:
             pass
 
-        self.obj = QJL.QFIM_obj(
-            self.W, self.eps, self.para_type, LDtype
-        )
-        system = QJL.QuanEstSystem(
-            self.opt, self.alg, self.obj, self.dynamic, self.output
-        )
-        QJL.run(system)
+        self.obj = QJL.QFIM_obj(W=self.W, eps=self.eps, LDtype=LDtype)
+        getattr(QJL, "optimize!")(self.scheme, self.opt, algorithm=self.alg, objective=self.obj, savefile=self.savefile)
 
         max_num = self.max_episode if isinstance(self.max_episode, int) else self.max_episode[0]
         self.load_save(max_num)
@@ -388,11 +383,8 @@ class StateSystem:
                 W = np.eye(self.para_num)
             self.W = W
 
-        self.obj = QJL.CFIM_obj(M, self.W, self.eps, self.para_type)
-        system = QJL.QuanEstSystem(
-            self.opt, self.alg, self.obj, self.dynamic, self.output
-        )
-        QJL.run(system)
+        self.obj = QJL.CFIM_obj(M=M, W=self.W, eps=self.eps)
+        getattr(QJL, "optimize!")(self.scheme, self.opt, algorithm=self.alg, objective=self.obj, savefile=self.savefile)
 
         max_num = self.max_episode if isinstance(self.max_episode, int) else self.max_episode[0]
         self.load_save(max_num)
@@ -434,11 +426,8 @@ class StateSystem:
                 "Supported type of dynamics are Lindblad and Kraus."
                 )
 
-        self.obj = QJL.HCRB_obj(self.W, self.eps, self.para_type)
-        system = QJL.QuanEstSystem(
-                self.opt, self.alg, self.obj, self.dynamic, self.output
-        )
-        QJL.run(system)
+        self.obj = QJL.HCRB_obj(W=self.W, eps=self.eps)
+        getattr(QJL, "optimize!")(self.scheme, self.opt, algorithm=self.alg, objective=self.obj, savefile=self.savefile)
 
         max_num = self.max_episode if isinstance(self.max_episode, int) else self.max_episode[0]
         self.load_save(max_num)

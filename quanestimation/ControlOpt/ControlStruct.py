@@ -219,19 +219,17 @@ class ControlSystem:
             ctrl_bound=self.ctrl_bound, 
             seed=self.seed
         )
-        self.dynamic = jl.QuanEstimation.Lindblad(
+        decay = [(self.decay_opt[i], self.gamma[i]) for i in range(len(self.decay_opt))]
+        dynamics = QJL.Lindblad(
             self.freeHamiltonian,
             self.Hamiltonian_derivative,
-            self.control_Hamiltonian,
-            self.control_coefficients,
-            self.rho0,
             self.tspan,
-            self.decay_opt,
-            self.gamma,
+            self.control_Hamiltonian,
+            decay,
+            ctrl = self.control_coefficients,
             dyn_method = self.dyn_method,
         )
-        self.output = QJL.Output(self.opt, save=self.savefile)
-
+        self.scheme = QJL.GeneralScheme(probe=self.rho0, param=dynamics)
         self.dynamics_type = "lindblad"
 
     def QFIM(self, W=[], LDtype="SLD"):
@@ -263,13 +261,8 @@ class ControlSystem:
             W = np.eye(len(self.Hamiltonian_derivative))
         self.W = W
 
-        self.obj = QJL.QFIM_obj(
-            self.W, self.eps, self.para_type, LDtype
-        )
-        system = QJL.QuanEstSystem(
-            self.opt, self.alg, self.obj, self.dynamic, self.output
-        )
-        QJL.run(system)
+        self.obj = QJL.QFIM_obj(W=self.W, eps=self.eps, LDtype=LDtype)
+        getattr(QJL, "optimize!")(self.scheme, self.opt, algorithm=self.alg, objective=self.obj, savefile=self.savefile)
         max_num = self.max_episode if type(self.max_episode) == int else self.max_episode[0]
         self.load_save(len(self.control_Hamiltonian), max_num)
 
@@ -302,11 +295,8 @@ class ControlSystem:
             W = np.eye(len(self.Hamiltonian_derivative))
         self.W = W
 
-        self.obj = QJL.CFIM_obj(M, self.W, self.eps, self.para_type)
-        system = QJL.QuanEstSystem(
-            self.opt, self.alg, self.obj, self.dynamic, self.output
-        )
-        QJL.run(system)
+        self.obj = QJL.CFIM_obj(M=M, W=self.W, eps=self.eps)
+        getattr(QJL, "optimize!")(self.scheme, self.opt, algorithm=self.alg, objective=self.obj, savefile=self.savefile)
         max_num = self.max_episode if type(self.max_episode) == int else self.max_episode[0]
         self.load_save(len(self.control_Hamiltonian), max_num)
 
@@ -336,11 +326,8 @@ class ControlSystem:
                 W = np.eye(len(self.Hamiltonian_derivative))
             self.W = W  
 
-            self.obj = QJL.HCRB_obj(self.W, self.eps, self.para_type)
-            system = QJL.QuanEstSystem(
-                self.opt, self.alg, self.obj, self.dynamic, self.output
-            )
-            QJL.run(system)
+            self.obj = QJL.HCRB_obj(W=self.W, eps=self.eps)
+            getattr(QJL, "optimize!")(self.scheme, self.opt, algorithm=self.alg, objective=self.obj, savefile=self.savefile)
             max_num = self.max_episode if type(self.max_episode) == int else self.max_episode[0]
         self.load_save(len(self.control_Hamiltonian), max_num)
 
@@ -396,7 +383,6 @@ class ControlSystem:
                     "savefile is set to be False",
                     DeprecationWarning,
                 )
-        self.output = QJL.Output(self.opt)
 
         if len(self.Hamiltonian_derivative) > 1:
             f = 1 / f
@@ -407,30 +393,23 @@ class ControlSystem:
 
         if M != []:
             M = [np.array(x, dtype=np.complex128) for x in M]
-            self.obj = QJL.CFIM_obj(M, self.W, self.eps, self.para_type)
+            self.obj = QJL.CFIM_obj(M=M, W=self.W, eps=self.eps)
         else:
             if target == "HCRB":
                 if self.para_type == "single_para":
                     print(
                         "Program terminated. In the single-parameter scenario, the HCRB is equivalent to the QFI. Please choose 'QFIM' as the objective function.")
-                self.obj = QJL.HCRB_obj(
-                    self.W, self.eps, self.para_type
-                )
+                self.obj = QJL.HCRB_obj(W=self.W, eps=self.eps)
             elif target == "QFIM" or (
                 LDtype == "SLD" and LDtype == "LLD" and LDtype == "RLD"
             ):
-                self.obj = QJL.QFIM_obj(
-                    self.W, self.eps, self.para_type, LDtype
-                )
+                self.obj = QJL.QFIM_obj(W=self.W, eps=self.eps, LDtype=LDtype)
             else:
                 raise ValueError(
                     "Please enter the correct values for target and LDtype. Supported target are 'QFIM', 'CFIM' and 'HCRB', supported LDtype are 'SLD', 'RLD' and 'LLD'."
                 )
 
-        system = QJL.QuanEstSystem(
-            self.opt, self.alg, self.obj, self.dynamic, self.output
-        )
-        QJL.mintime(method, f, system)
+        QJL.mintime(method, f, self.scheme, self.opt, algorithm=self.alg, objective=self.obj)
         max_num = self.max_episode if type(self.max_episode) == int else self.max_episode[0]
         self.load_save(len(self.control_Hamiltonian), max_num)
 

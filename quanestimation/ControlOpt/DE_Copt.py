@@ -82,13 +82,7 @@ class DE_Copt(Control.ControlSystem):
             "LLD" -- QFI (QFIM) based on left logarithmic derivative (LLD).
         """
         ini_population = (self.ctrl0, )
-        self.alg = QJL.DE(
-            self.max_episode,
-            self.p_num,
-            ini_population,
-            self.c,
-            self.cr,
-        )
+        self.alg = QJL.DE(max_episode=self.max_episode, p_num=self.p_num, ini_population=ini_population, c=self.c, cr=self.cr)
 
         super().QFIM(W, LDtype)
 
@@ -113,13 +107,7 @@ class DE_Copt(Control.ControlSystem):
             solutions.html).
         """
         ini_population = (self.ctrl0, )
-        self.alg = QJL.DE(
-            self.max_episode,
-            self.p_num,
-            ini_population,
-            self.c,
-            self.cr,
-        )
+        self.alg = QJL.DE(max_episode=self.max_episode, p_num=self.p_num, ini_population=ini_population, c=self.c, cr=self.cr)
 
         super().CFIM(M, W)
 
@@ -137,13 +125,7 @@ class DE_Copt(Control.ControlSystem):
         """
         
         ini_population = (self.ctrl0, )
-        self.alg = QJL.DE(
-            self.max_episode,
-            self.p_num,
-            ini_population,
-            self.c,
-            self.cr,
-        )
+        self.alg = QJL.DE(max_episode=self.max_episode, p_num=self.p_num, ini_population=ini_population, c=self.c, cr=self.cr)
 
         super().HCRB(W)
 
@@ -188,12 +170,6 @@ class DE_Copt(Control.ControlSystem):
             solutions.html).
         """
         ini_population = (self.ctrl0, )
-        self.alg = QJL.DE(
-            self.max_episode,
-            self.p_num,
-            ini_population,
-            self.c,
-            self.cr,
-        )
+        self.alg = QJL.DE(max_episode=self.max_episode, p_num=self.p_num, ini_population=ini_population, c=self.c, cr=self.cr)
         
         super().mintime(f, W, M, method, target, LDtype)

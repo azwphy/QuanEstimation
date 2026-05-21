@@ -81,11 +81,11 @@ class DE_Sopt(State.StateSystem):
         """
         ini_population = (self.psi,)
         self.alg = QJL.DE(
-            self.max_episode,
-            self.p_num,
-            ini_population,
-            self.c,
-            self.cr,
+            max_episode=self.max_episode,
+            p_num=self.p_num,
+            ini_population=ini_population,
+            c=self.c,
+            cr=self.cr,
         )
         super().QFIM(W, LDtype)
 
@@ -111,11 +111,11 @@ class DE_Sopt(State.StateSystem):
         """
         ini_population = (self.psi,)
         self.alg = QJL.DE(
-            self.max_episode,
-            self.p_num,
-            ini_population,
-            self.c,
-            self.cr,
+            max_episode=self.max_episode,
+            p_num=self.p_num,
+            ini_population=ini_population,
+            c=self.c,
+            cr=self.cr,
         )
         super().CFIM(M, W)
 
@@ -133,10 +133,10 @@ class DE_Sopt(State.StateSystem):
         """
         ini_population = (self.psi,)
         self.alg = QJL.DE(
-            self.max_episode,
-            self.p_num,
-            ini_population,
-            self.c,
-            self.cr,
+            max_episode=self.max_episode,
+            p_num=self.p_num,
+            ini_population=ini_population,
+            c=self.c,
+            cr=self.cr,
         )
         super().HCRB(W)

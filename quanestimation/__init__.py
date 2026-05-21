@@ -1,9 +1,16 @@
 """Top-level package for quanestimation."""
 __version__ = "0.2.8"
 
-from .Common.Common import load_julia
+_QJL = None
 
-QJL = load_julia()
+def __getattr__(name):
+    if name == "QJL":
+        global _QJL
+        if _QJL is None:
+            from .Common.Common import load_julia
+            _QJL = load_julia()
+        return _QJL
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 from quanestimation.AsymptoticBound.CramerRao import (
     CFIM,

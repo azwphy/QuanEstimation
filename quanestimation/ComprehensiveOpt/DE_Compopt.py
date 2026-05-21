@@ -99,13 +99,12 @@ class DE_Compopt(Comp.ComprehensiveSystem):
         """
         ini_population = (self.psi, self.ctrl0)
         self.alg = QJL.DE(
-            self.max_episode,
-            self.p_num,
-            ini_population,
-            self.c,
-            self.cr,
+            max_episode=self.max_episode,
+            p_num=self.p_num,
+            ini_population=ini_population,
+            c=self.c,
+            cr=self.cr,
         )
-        
         super().SC(W, M, target, LDtype)
 
     def CM(self, rho0, W=[]):
@@ -122,11 +121,11 @@ class DE_Compopt(Comp.ComprehensiveSystem):
         """
         ini_population = (self.ctrl0, self.measurement0)
         self.alg = QJL.DE(
-            self.max_episode,
-            self.p_num,
-            ini_population,
-            self.c,
-            self.cr,
+            max_episode=self.max_episode,
+            p_num=self.p_num,
+            ini_population=ini_population,
+            c=self.c,
+            cr=self.cr,
         )
 
         super().CM(rho0, W)
@@ -142,11 +141,11 @@ class DE_Compopt(Comp.ComprehensiveSystem):
         """
         ini_population = (self.psi, self.measurement0)
         self.alg = QJL.DE(
-            self.max_episode,
-            self.p_num,
-            ini_population,
-            self.c,
-            self.cr,
+            max_episode=self.max_episode,
+            p_num=self.p_num,
+            ini_population=ini_population,
+            c=self.c,
+            cr=self.cr,
         )
 
         super().SM(W)
@@ -162,11 +161,11 @@ class DE_Compopt(Comp.ComprehensiveSystem):
         """
         ini_population = (self.psi, self.ctrl0, self.measurement0)
         self.alg = QJL.DE(
-            self.max_episode,
-            self.p_num,
-            ini_population,
-            self.c,
-            self.cr,
+            max_episode=self.max_episode,
+            p_num=self.p_num,
+            ini_population=ini_population,
+            c=self.c,
+            cr=self.cr,
         )
 
         super().SCM(W)

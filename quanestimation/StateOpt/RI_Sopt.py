@@ -61,7 +61,7 @@ class RI_Sopt(State.StateSystem):
             is available here.
         """
         self.alg = QJL.RI(
-            self.max_episode,
+            max_episode=self.max_episode,
         )
         if self.dynamics_type != "Kraus":
             raise ValueError("Only the parameterization with Kraus operators is available.")

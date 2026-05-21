@@ -91,13 +91,13 @@ class NM_Sopt(State.StateSystem):
         """
         ini_state = self.psi
         self.alg = QJL.NM(
-            self.max_episode,
-            self.p_num,
-            ini_state,
-            self.ar,
-            self.ae,
-            self.ac,
-            self.as0,
+            max_episode=self.max_episode,
+            p_num=self.p_num,
+            nelder_mead=ini_state,
+            ar=self.ar,
+            ae=self.ae,
+            ac=self.ac,
+            as0=self.as0,
         )
 
         super().QFIM(W, LDtype)
@@ -124,13 +124,13 @@ class NM_Sopt(State.StateSystem):
         """
         ini_state = self.psi
         self.alg = QJL.NM(
-            self.max_episode,
-            self.p_num,
-            ini_state,
-            self.ar,
-            self.ae,
-            self.ac,
-            self.as0,
+            max_episode=self.max_episode,
+            p_num=self.p_num,
+            nelder_mead=ini_state,
+            ar=self.ar,
+            ae=self.ae,
+            ac=self.ac,
+            as0=self.as0,
         )
 
         super().CFIM(M, W)
@@ -149,13 +149,13 @@ class NM_Sopt(State.StateSystem):
         """
         ini_state = self.psi
         self.alg = QJL.NM(
-            self.max_episode,
-            self.p_num,
-            ini_state,
-            self.ar,
-            self.ae,
-            self.ac,
-            self.as0,
+            max_episode=self.max_episode,
+            p_num=self.p_num,
+            nelder_mead=ini_state,
+            ar=self.ar,
+            ae=self.ae,
+            ac=self.ac,
+            as0=self.as0,
         )
 
         super().HCRB(W)

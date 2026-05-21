@@ -347,7 +347,8 @@ class ComprehensiveSystem:
             self.C = [self.measurement0[0][i] for i in range(len(self.psi))]
             self.C = [np.array(x, dtype=np.complex128) for x in self.C]
 
-        self.dynamic = QJL.Kraus(list(self.psi0), self.K, self.dK)
+        dynamics = QJL.Kraus(self.K, self.dK)
+        self.scheme = QJL.GeneralScheme(probe=self.psi0, param=dynamics)
 
         self.dynamics_type = "Kraus"
 
@@ -393,7 +394,7 @@ class ComprehensiveSystem:
 
         if M != []:
             M = [np.array(x, dtype=np.complex128) for x in M]
-            self.obj = QJL.CFIM_obj(M, self.W, self.eps, self.para_type)
+            self.obj = QJL.CFIM_obj(M=M, W=self.W, eps=self.eps)
         else:
             if target == "HCRB":
                 if self.para_type == "single_para":
@@ -401,16 +402,16 @@ class ComprehensiveSystem:
                         "Program terminated. In the single-parameter scenario, the HCRB is equivalent to the QFI. Please choose 'QFIM' as the objective function"
                     )
                 else:
-                    self.obj = QJL.HCRB_obj(self.W, self.eps, self.para_type)
+                    self.obj = QJL.HCRB_obj(W=self.W, eps=self.eps)
             elif target == "QFIM" and (
                 LDtype == "SLD" or LDtype == "RLD" or LDtype == "LLD"
             ):
                 self.obj = QJL.QFIM_obj(
-                    self.W, self.eps, self.para_type, LDtype
+                    W=self.W, eps=self.eps, LDtype=LDtype
                 )
             elif target == "CFIM":
                 M = SIC(len(self.psi))
-                self.obj = QJL.CFIM_obj(M, self.W, self.eps, self.para_type)
+                self.obj = QJL.CFIM_obj(M=M, W=self.W, eps=self.eps)
             else:
                 raise ValueError(
                     "Please enter the correct values for target and LDtype. Supported target are 'QFIM', 'CFIM' and 'HCRB', supported LDtype are 'SLD', 'RLD' and 'LLD'."
@@ -419,23 +420,15 @@ class ComprehensiveSystem:
         self.opt = QJL.StateControlOpt(
             psi=self.psi, ctrl=self.control_coefficients, ctrl_bound=self.ctrl_bound, seed=self.seed
         )
-        self.output = QJL.Output(self.opt, save=self.savefile)
-
-        self.dynamic = QJL.Lindblad(
-            self.freeHamiltonian,
-            self.Hamiltonian_derivative,
-            self.control_Hamiltonian,
-            self.control_coefficients,
-            list(self.psi0),
-            self.tspan,
-            self.decay_opt,
-            self.gamma,
-            dyn_method = self.dyn_method,
-            )
-        system = QJL.QuanEstSystem(
-            self.opt, self.alg, self.obj, self.dynamic, self.output
+        decay = [(self.decay_opt[i], self.gamma[i]) for i in range(len(self.decay_opt))]
+        dynamics = QJL.Lindblad(
+            self.freeHamiltonian, self.Hamiltonian_derivative,
+            self.tspan, self.control_Hamiltonian, decay,
+            ctrl=self.control_coefficients,
+            dyn_method=self.dyn_method,
         )
-        QJL.run(system)
+        self.scheme = QJL.GeneralScheme(probe=self.psi0, param=dynamics)
+        getattr(QJL, "optimize!")(self.scheme, self.opt, algorithm=self.alg, objective=self.obj, savefile=self.savefile)
 
         max_num = self.max_episode if type(self.max_episode) == int else self.max_episode[0]
         self.load_save_states(max_num)
@@ -465,28 +458,19 @@ class ComprehensiveSystem:
 
         self.rho0 = np.array(rho0, dtype=np.complex128)
 
-        self.obj = QJL.CFIM_obj([], self.W, self.eps, self.para_type)
+        self.obj = QJL.CFIM_obj(W=self.W, eps=self.eps)
         self.opt = QJL.ControlMeasurementOpt(
             ctrl=self.control_coefficients, M=self.C, ctrl_bound=self.ctrl_bound, seed=self.seed
         )
-        self.output = QJL.Output(self.opt, save=self.savefile)
-
-        self.dynamic = QJL.Lindblad(
-            self.freeHamiltonian,
-            self.Hamiltonian_derivative,
-            self.control_Hamiltonian,
-            self.control_coefficients,
-            self.rho0,
-            self.tspan,
-            self.decay_opt,
-            self.gamma,
-            dyn_method =self.dyn_method,
-            )
-
-        system = QJL.QuanEstSystem(
-            self.opt, self.alg, self.obj, self.dynamic, self.output
+        decay = [(self.decay_opt[i], self.gamma[i]) for i in range(len(self.decay_opt))]
+        dynamics = QJL.Lindblad(
+            self.freeHamiltonian, self.Hamiltonian_derivative,
+            self.tspan, self.control_Hamiltonian, decay,
+            ctrl=self.control_coefficients,
+            dyn_method=self.dyn_method,
         )
-        QJL.run(system)
+        self.scheme = QJL.GeneralScheme(probe=self.rho0, param=dynamics)
+        getattr(QJL, "optimize!")(self.scheme, self.opt, algorithm=self.alg, objective=self.obj, savefile=self.savefile)
 
         max_num = self.max_episode if type(self.max_episode) == int else self.max_episode[0]
         self.load_save_ctrls_alt(len(self.control_Hamiltonian), max_num)
@@ -619,15 +603,13 @@ class ComprehensiveSystem:
                             np.array(x, dtype=np.complex128) for x in Htot
                         ]
 
-            self.dynamic = QJL.Lindblad(
-                freeHamiltonian,
-                self.Hamiltonian_derivative,
-                list(self.psi0),
-                self.tspan,
-                self.decay_opt,
-                self.gamma,
-                dyn_method = self.dyn_method,
+            decay = [(self.decay_opt[i], self.gamma[i]) for i in range(len(self.decay_opt))]
+            dynamics = QJL.Lindblad(
+                freeHamiltonian, self.Hamiltonian_derivative,
+                self.tspan, decay=decay,
+                dyn_method=self.dyn_method,
             )
+            self.scheme = QJL.GeneralScheme(probe=self.psi0, param=dynamics)
         elif self.dynamics_type == "Kraus":
             if W == []:
                 W = np.eye(self.para_num)
@@ -637,14 +619,9 @@ class ComprehensiveSystem:
                 "Supported type of dynamics are Lindblad and Kraus."
                 )
 
-        self.obj = QJL.CFIM_obj([], self.W, self.eps, self.para_type)
+        self.obj = QJL.CFIM_obj(W=self.W, eps=self.eps)
         self.opt = QJL.StateMeasurementOpt(psi=list(self.psi), M=self.C, seed=self.seed)
-        self.output = QJL.Output(self.opt, save=self.savefile)
-
-        system = QJL.QuanEstSystem(
-            self.opt, self.alg, self.obj, self.dynamic, self.output
-        )
-        QJL.run(system)
+        getattr(QJL, "optimize!")(self.scheme, self.opt, algorithm=self.alg, objective=self.obj, savefile=self.savefile)
 
         max_num = self.max_episode if type(self.max_episode) == int else self.max_episode[0]
         self.load_save_states(max_num)
@@ -668,27 +645,19 @@ class ComprehensiveSystem:
             W = np.eye(len(self.Hamiltonian_derivative))
         self.W = W
 
-        self.obj = QJL.CFIM_obj([], self.W, self.eps, self.para_type)
+        self.obj = QJL.CFIM_obj(W=self.W, eps=self.eps)
         self.opt = QJL.StateControlMeasurementOpt(
             psi=self.psi, ctrl=self.control_coefficients, M=self.C, ctrl_bound=self.ctrl_bound, seed=self.seed
         )
-        self.output = QJL.Output(self.opt, save=self.savefile)
-
-        self.dynamic = QJL.Lindblad(
-            self.freeHamiltonian,
-            self.Hamiltonian_derivative,
-            self.control_Hamiltonian,
-            self.control_coefficients,
-            list(self.psi0),
-            self.tspan,
-            self.decay_opt,
-            self.gamma,
-            )
-
-        system = QJL.QuanEstSystem(
-            self.opt, self.alg, self.obj, self.dynamic, self.output
+        decay = [(self.decay_opt[i], self.gamma[i]) for i in range(len(self.decay_opt))]
+        dynamics = QJL.Lindblad(
+            self.freeHamiltonian, self.Hamiltonian_derivative,
+            self.tspan, self.control_Hamiltonian, decay,
+            ctrl=self.control_coefficients,
+            dyn_method=self.dyn_method,
         )
-        QJL.run(system)
+        self.scheme = QJL.GeneralScheme(probe=self.psi0, param=dynamics)
+        getattr(QJL, "optimize!")(self.scheme, self.opt, algorithm=self.alg, objective=self.obj, savefile=self.savefile)
 
         max_num = self.max_episode if type(self.max_episode) == int else self.max_episode[0]
         self.load_save_states(max_num)

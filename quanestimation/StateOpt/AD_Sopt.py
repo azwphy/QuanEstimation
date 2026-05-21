@@ -66,10 +66,10 @@ class AD_Sopt(State.StateSystem):
 
         if self.Adam:
             self.alg = QJL.AD(
-                self.max_episode, self.epsilon, self.beta1, self.beta2,
+                Adam=True, max_episode=self.max_episode, epsilon=self.epsilon, beta1=self.beta1, beta2=self.beta2,
             )
         else:
-            self.alg = QJL.AD(self.max_episode, self.epsilon)
+            self.alg = QJL.AD(Adam=False, max_episode=self.max_episode, epsilon=self.epsilon)
 
     def QFIM(self, W=[], LDtype="SLD"):
         r"""

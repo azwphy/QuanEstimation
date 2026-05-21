@@ -12,11 +12,27 @@ def load_julia():
     """
     Load Julia and initialize QuanEstimation module.
     
+    In development mode, set environment variable:
+        QuanEstimation_DEV_PATH=/path/to/julia_repo
+    
     Returns:
         jl.Main.QuanEstimation: Julia module for quantum estimation
     """
     jl = juliacall.newmodule("QuanEstimation")
-    jl.Main.seval('import Pkg; Pkg.add(name="QuanEstimation", version="0.1.6")')
+    
+    dev_path = os.environ.get("QuanEstimation_DEV_PATH", None)
+    if dev_path:
+        jl.Main.seval(
+            'import Pkg; Pkg.develop([Pkg.PackageSpec(path="%s"), '
+            'Pkg.PackageSpec(path="%s/lib/QuanEstimationBase"), '
+            'Pkg.PackageSpec(path="%s/lib/NVMagnetometer")])'
+            % (dev_path, dev_path, dev_path)
+        )
+    else:
+        jl.Main.seval(
+            'import Pkg; Pkg.add(name="QuanEstimation", version="0.2.2")'
+        )
+
     jl.Main.seval("using QuanEstimation, PythonCall")
     return jl.Main.QuanEstimation
 

@@ -378,25 +378,14 @@ class MeasurementSystem:
             self.gamma = [decay[i][1] for i in range(len(decay))]
         self.decay_opt = [np.array(x, dtype=np.complex128) for x in decay_opt]
 
-        if any(self.gamma):
-            self.dynamic = QJL.Lindblad(
-                self.freeHamiltonian,
-                self.Hamiltonian_derivative,
-                self.rho0,
-                self.tspan,
-                self.decay_opt,
-                self.gamma,
-                dyn_method = self.dyn_method,
-            )
-        else:
-            self.dynamic = QJL.Lindblad(
-                self.freeHamiltonian,
-                self.Hamiltonian_derivative,
-                self.rho0,
-                self.tspan,
-                dyn_method = self.dyn_method,
-            )
-        self.output = QJL.Output(self.opt, save=self.savefile)
+        decay = [(self.decay_opt[i], self.gamma[i]) for i in range(len(self.decay_opt))]
+        dynamics = QJL.Lindblad(
+            self.freeHamiltonian, self.Hamiltonian_derivative,
+            self.tspan, decay,
+            dyn_method=self.dyn_method,
+        )
+        scheme = QJL.GeneralScheme(probe=self.rho0, param=dynamics)
+        self.scheme = scheme
         
         self.dynamics_type = "dynamics"
 
@@ -570,8 +559,9 @@ class MeasurementSystem:
                 )
             )
 
-        self.dynamic = QJL.Kraus(self.rho0, self.K, self.dK)
-        self.output = QJL.Output(self.opt, save=self.savefile)
+        dynamics = QJL.Kraus(self.K, self.dK)
+        scheme = QJL.GeneralScheme(probe=self.rho0, param=dynamics)
+        self.scheme = scheme
 
         self.dynamics_type = "Kraus"
 
@@ -600,13 +590,8 @@ class MeasurementSystem:
                 "Supported type of dynamics are Lindblad and Kraus."
                 )
 
-        self.obj = QJL.CFIM_obj(
-            [], self.W, self.eps, self.para_type
-        )  #### m=[]
-        system = QJL.QuanEstSystem(
-            self.opt, self.alg, self.obj, self.dynamic, self.output
-        )
-        QJL.run(system)
+        self.obj = QJL.CFIM_obj(W=self.W, eps=self.eps)
+        getattr(QJL, "optimize!")(self.scheme, self.opt, algorithm=self.alg, objective=self.obj, savefile=self.savefile)
         max_num = self.max_episode if type(self.max_episode) == int else self.max_episode[0]
         self.load_save(self.M_num, max_num)
 

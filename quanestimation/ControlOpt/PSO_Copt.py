@@ -93,14 +93,7 @@ class PSO_Copt(Control.ControlSystem):
             "LLD" -- QFI (QFIM) based on left logarithmic derivative (LLD).
         """
         ini_particle = (self.ctrl0, )
-        self.alg = QJL.PSO(
-            self.max_episode,
-            self.p_num,
-            ini_particle,
-            self.c0,
-            self.c1,
-            self.c2,
-        )
+        self.alg = QJL.PSO(max_episode=self.max_episode, p_num=self.p_num, ini_particle=ini_particle, c0=self.c0, c1=self.c1, c2=self.c2)
 
         super().QFIM(W, LDtype)
 
@@ -125,14 +118,7 @@ class PSO_Copt(Control.ControlSystem):
             solutions.html).
         """
         ini_particle = (self.ctrl0, )
-        self.alg = QJL.PSO(
-            self.max_episode,
-            self.p_num,
-            ini_particle,
-            self.c0,
-            self.c1,
-            self.c2,
-        )
+        self.alg = QJL.PSO(max_episode=self.max_episode, p_num=self.p_num, ini_particle=ini_particle, c0=self.c0, c1=self.c1, c2=self.c2)
 
         super().CFIM(M, W)
 
@@ -149,14 +135,7 @@ class PSO_Copt(Control.ControlSystem):
             -- Weight matrix.
         """
         ini_particle = (self.ctrl0, )
-        self.alg = QJL.PSO(
-            self.max_episode,
-            self.p_num,
-            ini_particle,
-            self.c0,
-            self.c1,
-            self.c2,
-        )
+        self.alg = QJL.PSO(max_episode=self.max_episode, p_num=self.p_num, ini_particle=ini_particle, c0=self.c0, c1=self.c1, c2=self.c2)
 
         super().HCRB(W)
 
@@ -201,13 +180,6 @@ class PSO_Copt(Control.ControlSystem):
             solutions.html).
         """
         ini_particle = (self.ctrl0,)
-        self.alg = QJL.PSO(
-            self.max_episode,
-            self.p_num,
-            ini_particle,
-            self.c0,
-            self.c1,
-            self.c2,
-        )
+        self.alg = QJL.PSO(max_episode=self.max_episode, p_num=self.p_num, ini_particle=ini_particle, c0=self.c0, c1=self.c1, c2=self.c2)
         
         super().mintime(f, W, M, method, target, LDtype)

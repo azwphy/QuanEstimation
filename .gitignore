@@ -149,6 +149,9 @@ dmypy.json
 
 #manifest
 quanestimation/JuliaSrc/Manifest.toml
+quanestimation/JuliaSrc/Project.toml
+quanestimation/JuliaSrc/sys_image/
+quanestimation/JuliaSrc/utils.jl
 
 #history
 .history

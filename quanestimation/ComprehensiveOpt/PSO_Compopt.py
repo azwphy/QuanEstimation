@@ -115,12 +115,12 @@ class PSO_Compopt(Comp.ComprehensiveSystem):
        )
         
         self.alg = QJL.PSO(
-            QJL.Vector[QJL.Int64](self.max_episode),
-            self.p_num,
-            ini_particle,
-            self.c0,
-            self.c1,
-            self.c2,
+            max_episode=self.max_episode,
+            p_num=self.p_num,
+            ini_particle=ini_particle,
+            c0=self.c0,
+            c1=self.c1,
+            c2=self.c2,
         )
         super().SC(W, M, target, LDtype)
 
@@ -138,12 +138,12 @@ class PSO_Compopt(Comp.ComprehensiveSystem):
         """
         ini_particle = (self.ctrl0, self.measurement0)
         self.alg = QJL.PSO(
-            QJL.Vector[QJL.Int64](self.max_episode),
-            self.p_num,
-            ini_particle,
-            self.c0,
-            self.c1,
-            self.c2,
+            max_episode=self.max_episode,
+            p_num=self.p_num,
+            ini_particle=ini_particle,
+            c0=self.c0,
+            c1=self.c1,
+            c2=self.c2,
         )
 
         super().CM(rho0, W)
@@ -159,12 +159,12 @@ class PSO_Compopt(Comp.ComprehensiveSystem):
         """
         ini_particle = (self.psi, self.measurement0)
         self.alg = QJL.PSO(
-            QJL.Vector[QJL.Int64](self.max_episode),
-            self.p_num,
-            ini_particle,
-            self.c0,
-            self.c1,
-            self.c2,
+            max_episode=self.max_episode,
+            p_num=self.p_num,
+            ini_particle=ini_particle,
+            c0=self.c0,
+            c1=self.c1,
+            c2=self.c2,
         )
 
         super().SM(W)
@@ -180,12 +180,12 @@ class PSO_Compopt(Comp.ComprehensiveSystem):
         """
         ini_particle = (self.psi, self.ctrl0, self.measurement0)
         self.alg = QJL.PSO(
-            QJL.Vector[QJL.Int64](self.max_episode),
-            self.p_num,
-            ini_particle,
-            self.c0,
-            self.c1,
-            self.c2,
+            max_episode=self.max_episode,
+            p_num=self.p_num,
+            ini_particle=ini_particle,
+            c0=self.c0,
+            c1=self.c1,
+            c2=self.c2,
         )
         
         super().SCM(W)

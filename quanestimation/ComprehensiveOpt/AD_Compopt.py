@@ -111,10 +111,18 @@ class AD_Compopt(Comp.ComprehensiveSystem):
             )
 
         if self.Adam:
-            self.alg = QJL.QuanEstimation.AD(
-                self.max_episode, self.epsilon, self.beta1, self.beta2
+            self.alg = QJL.AD(
+                Adam=True,
+                max_episode=self.max_episode,
+                epsilon=self.epsilon,
+                beta1=self.beta1,
+                beta2=self.beta2,
             )
         else:
-            self.alg = QJL.QuanEstimation.AD(self.max_episode, self.epsilon)
+            self.alg = QJL.AD(
+                Adam=False,
+                max_episode=self.max_episode,
+                epsilon=self.epsilon,
+            )
 
         super().SC(W, M, target, LDtype)

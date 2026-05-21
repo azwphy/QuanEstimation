@@ -91,12 +91,12 @@ class PSO_Mopt(Measurement.MeasurementSystem):
         """
         ini_particle = (self.measurement0,)
         self.alg = QJL.PSO(
-            self.max_episode,
-            self.p_num,
-            ini_particle,
-            self.c0,
-            self.c1,
-            self.c2,
+            max_episode=self.max_episode,
+            p_num=self.p_num,
+            ini_particle=ini_particle,
+            c0=self.c0,
+            c1=self.c1,
+            c2=self.c2,
         )
         
         super().CFIM(W)
