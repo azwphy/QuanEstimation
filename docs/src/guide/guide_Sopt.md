@@ -121,7 +121,7 @@ Call the following codes to perform state optimizaiton
 The code for state optimization with AD is as follows
 === "Python"
     ``` py
-    state = StateOpt(method="GRAPE", **kwargs)
+    state = StateOpt(method="AD", **kwargs)
     ```
     where `kwargs` is of the form
     ``` py
@@ -366,7 +366,9 @@ $g$ as the unknown parameter to be estimated. The states are expanded as
 $|\psi\rangle=\sum^J_{m=-J}c_m|J,m\rangle$ with $|J,m\rangle$ the Dicke state and $c_m$ a complex 
 coefficient. Here we fixed $J=N/2$. In this example, the probe state is optimized for both noiseless
 scenario and collective dephasing noise. The dynamics under collective dephasing can be expressed as
-<center> $\partial_t\rho = -i[H_{\mathrm{LMG}},\rho]+\gamma \left(J_3\rho J_3-\frac{1}{2}\left\{\rho, J^2_3\right\}\right)$ </center>
+$$
+\partial_t\rho = -i[H_{\mathrm{LMG}},\rho]+\gamma \left(J_3\rho J_3-\frac{1}{2}\left\{\rho, J^2_3\right\}\right)
+$$
 with $\gamma$ the decay rate.
 
 In this case, all searches with different algorithms start from the coherent spin state defined by
@@ -1179,3 +1181,5 @@ QuTiP: An open-source Python framework for the dynamics of open quantum systems,
 J. R. Johansson, P. D. Nation, and F. Nori,
 QuTiP 2: A Python framework for the dynamics of open quantum systems,
 [Comp. Phys. Comm. **184**, 1234 (2013).](https://doi.org/10.1016/j.cpc.2012.11.019)
+
+**See also**: [Parameterization process](guide_dynamics.md) — construct the system dynamics. [Quantum metrological tools](guide_bounds.md) — the objective functions being optimized. [Output files](output_files.md) — how to load the saved `states.npy` results.

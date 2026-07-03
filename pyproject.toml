@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "quanestimation"
-version = "0.2.8"
+version = "0.3.0"
 description = "A package for quantum parameter estimation."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -25,23 +25,17 @@ classifiers = [
     "Programming Language :: Python :: 3.13"
 ]
 dependencies = [
-    "pip>=19.2.3",
-    "bump2version>=0.5.11",
-    "wheel>=0.33.6",
-    "numpy",
-    "sympy",
-    "scipy",
-    "cvxpy",
+    "numpy>=1.21",
+    "sympy>=1.9",
+    "scipy>=1.7",
+    "cvxpy>=1.2",
     "juliacall>=0.9.26",
-    "more_itertools",
-    "h5py"
+    "more_itertools>=8.12",
+    "h5py>=3.6"
 ]
 
 [project.urls]
 Homepage = "https://github.com/QuanEstimation/QuanEstimation"
-
-[project.scripts]
-quanestimation = "quanestimation.cli:main"
 
 [project.optional-dependencies]
 test = [

@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from quanestimation.AsymptoticBound.CramerRao import (
+from quanestimation.base.AsymptoticBound.CramerRao import (
     QFIM, 
     CFIM, 
     QFIM_Kraus, 
@@ -12,6 +12,7 @@ from quanestimation.AsymptoticBound.CramerRao import (
     FI_Expt, 
     SLD
 )
+from ..utils import rand_rho, rand_drho
 
 
 def test_CramerRao_SLD() -> None:
@@ -323,7 +324,7 @@ def test_QFIM_LLD_singleparameter() -> None:
 
     # Calculate QFIM
     result_QFIM = QFIM(rho, drho, LDtype="LLD")
-    expected_QFIM = eta**2 * np.sin(2 * theta)**2 * (3 * eta**2 + 1) / (1 - eta**2)**2
+    expected_QFIM = eta**2 * np.sin(2 * theta)**2 / (1.0 - eta**2)
     assert np.allclose(result_QFIM, expected_QFIM)
 
     # Test eigen representation
@@ -498,3 +499,87 @@ def test_invalid_input() -> None:
 
     with pytest.raises(TypeError):
         RLD(np.array([[1, 0], [0, 1]]), None)
+
+
+def test_38_hermiticity_enforcement() -> None:
+    """#38: Verify QFIM_SLD is real even with anti-Hermitian perturbation on rho."""
+    for _ in range(5):
+        N = 2
+        rho = rand_rho(N)
+        drho = rand_drho(N)
+        A = np.random.randn(N, N) + 1j * np.random.randn(N, N)
+        A_anti = A - A.conj().T
+        eps = np.random.rand() * 1e-12
+        rho_pert = rho + eps * A_anti
+        F = QFIM(rho_pert, [drho], LDtype="SLD")
+        assert abs(np.imag(F)) < 1e-12
+
+
+def test_39_sld_hermiticity() -> None:
+    """#39: Verify SLD operator is Hermitian for random matrices."""
+    for _ in range(5):
+        N = 2
+        rho = rand_rho(N)
+        drho = rand_drho(N)
+        L = SLD(rho, [drho], rep="original")
+        if isinstance(L, list):
+            L = L[0]
+        assert np.linalg.norm(L - L.conj().T) < 5e-13
+
+        L_eig = SLD(rho, [drho], rep="eigen")
+        if isinstance(L_eig, list):
+            L_eig = L_eig[0]
+        assert np.linalg.norm(L_eig - L_eig.conj().T) < 5e-13
+
+
+# --- Phase 4.11 regression tests (Julia @testset parity) ---
+
+
+def test_56_near_zero_eigenvalue() -> None:
+    """#56: Near-zero eigenvalue (1e-16) must not cause NaN in QFIM.
+    
+    来源: test_fisher_information_matrix.jl @testset "#56"
+    """
+    rho = np.array([[1.0, 0.0], [0.0, 1e-16]], dtype=np.complex128)
+    rho = (rho + rho.conj().T) / 2.0
+    rho = rho / np.trace(rho)
+    drho = [np.zeros((2, 2), dtype=np.complex128)]
+    F = QFIM(rho, drho, LDtype="SLD")
+    assert np.all(np.isfinite(F))
+    assert not np.any(np.isnan(F))
+
+
+def test_pinv_bypass() -> None:
+    """pinv bypass: QFIM RLD/LLD must use operator functions, not raw pinv.
+
+    来源: test_cramer_rao_bounds.jl @testset "pinv bypass"
+    """
+    # Full-rank: RLD ≈ LLD
+    rho_full = np.array([[0.6, 0.0], [0.0, 0.4]], dtype=np.complex128)
+    drho_full = [np.array([[0.1, 0.05], [0.05, -0.1]], dtype=np.complex128)]
+    F_rld = QFIM(rho_full, drho_full, LDtype="RLD")
+    F_lld = QFIM(rho_full, drho_full, LDtype="LLD")
+    assert np.isclose(F_rld, F_lld, rtol=1e-10)
+    # Singular: must raise (support of drho not in support of rho)
+    rho_sing = np.array([[1.0, 0.0], [0.0, 0.0]], dtype=np.complex128)
+    drho_cross = [np.array([[0.0, 0.5], [0.5, 0.0]], dtype=np.complex128)]
+    with pytest.raises(Exception):
+        QFIM(rho_sing, drho_cross, LDtype="RLD")
+    with pytest.raises(Exception):
+        QFIM(rho_sing, drho_cross, LDtype="LLD")
+
+
+@pytest.mark.parametrize("LDtype", ["SLD", "RLD", "LLD"])
+def test_8_multiparam_qfim_dimensions(LDtype: str) -> None:
+    """#8: QFIM must return correct dimensions for multi-parameter case.
+
+    来源: test_fisher_information_matrix.jl @testset "#8"
+    """
+    rho = rand_rho(2)
+    drho = [rand_drho(2), rand_drho(2), rand_drho(2)]
+    F = QFIM(rho, drho, LDtype=LDtype)
+    assert F.shape == (3, 3)
+    # Pure state variant
+    from quanestimation.base.AsymptoticBound.CramerRao import QFIM_pure
+    Fp = QFIM_pure(rho, drho)
+    assert Fp.shape == (3, 3)

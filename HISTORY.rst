@@ -27,6 +27,16 @@ History
 0.2.7 (2025-07-22)
 
 0.2.8 (2025-08-03)
+------------------
+
+* Refactored package structure: split into ``quanestimation.base`` (core) and ``quanestimation.nv`` (NV magnetometer extension).
+* Added :class:`NVMagnetometerScheme` class for NV magnetometry support.
+* Added control waveform constructors: ``ZeroCTRL``, ``LinearCTRL``, ``SineCTRL``, ``SawCTRL``, ``TriangleCTRL``, ``GaussianCTRL``, ``GaussianEdgeCTRL``.
+* Added :func:`error_evaluation` and :func:`error_control` for error analysis.
+* Added state utilities: ``BellState``, ``PlusState``, ``MinusState``, ``SigmaX``/``SigmaY``/``SigmaZ``, ``sx``/``sy``/``sz``, :func:`fidelity`.
+* Added :func:`QFIM_pure` and :func:`Williamson_form`.
+* Added :class:`QubitDephasing` dynamics class.
+* Unified Julia-to-Python conversion layer.
 
 ------------------
 

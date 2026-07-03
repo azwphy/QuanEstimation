@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from quanestimation.Common.Common import (
+from quanestimation.base.Common.Common import (
     basis,
     gramschmidt,
     suN_generator,
@@ -29,7 +29,14 @@ def test_gramschmidt() -> None:
 
 
 def test_suN_generator() -> None:
-    """Test generation of SU(N) generators."""
+    """Test generation of SU(N) generators.
+
+    Covers Julia testsets suN_generatorU/V/W (test_sic.jl) via the merged
+    Python suN_generator function. SU(2) validates Pauli matrix patterns;
+    SU(3) validates all 8 Gell-Mann matrices including the diagonal W-type.
+
+    来源: test_sic.jl @testset "suN_generatorU/V/W"
+    """
     # Test SU(2) generators (Pauli matrices)
     result = suN_generator(2)
     sx = np.array([[0., 1.], [1., 0.]], dtype=np.complex128)

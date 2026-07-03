@@ -141,7 +141,7 @@ the eigenstates of $\sigma_3$ with respect to the eigenvalues $1$ and $-1$.
     dH = [0.5*sz]
     # dissipation
     sp = np.array([[0., 1.], [0., 0.]])  
-	sm = np.array([[0., 0.], [1., 0.]]) 
+    sm = np.array([[0., 0.], [1., 0.]]) 
     decay = [[sp, 0.0], [sm, 0.1]]
     # time length for the evolution
     tspan = np.linspace(0., 50., 2000)
@@ -164,14 +164,14 @@ the eigenstates of $\sigma_3$ with respect to the eigenvalues $1$ and $-1$.
     # free Hamiltonian
     omega = 1.0
     sx = [0. 1.; 1. 0.0im]
-	sy = [0. -im; im 0.]
-	sz = [1. 0.0im; 0. -1.]
+    sy = [0. -im; im 0.]
+    sz = [1. 0.0im; 0. -1.]
     H0 = 0.5*omega*sz
     # derivative of the free Hamiltonian on omega
     dH = [0.5*sz]
     # dissipation
     sp = [0. 1.; 0. 0.0im]
-	sm = [0. 0.; 1. 0.0im]
+    sm = [0. 0.; 1. 0.0im]
     decay = [[sp, 0.0], [sm, 0.1]]
     # time length for the evolution
     tspan = range(0., 50., length=2000)
@@ -340,7 +340,7 @@ In quantum metrology, the CFI (CFIM) are solved by
     which can be downloaded from [here](http://www.physics.umb.edu/Research/QBism/solutions.html). 
 
 **Example 3.4**  
-<a id="example2_4"></a>
+<a id="example3_4"></a>
 The Hamiltonian of a single qubit system is $H=\frac{1}{2}\omega \sigma_3$ with $\omega$ 
 the frequency and $\sigma_3$ a Pauli matrix. The dynamics of the system is governed by
 \begin{align}
@@ -369,11 +369,11 @@ the eigenstates of $\sigma_3$ with respect to the eigenvalues $1$ and $-1$.
     dH = [0.5*sz]
     # dissipation
     sp = np.array([[0., 1.], [0., 0.]])  
-	sm = np.array([[0., 0.], [1., 0.]]) 
+    sm = np.array([[0., 0.], [1., 0.]]) 
     decay = [[sp, 0.0], [sm, 0.1]]
     # measurement
     M1 = 0.5*np.array([[1., 1.], [1., 1.]])
-	M2 = 0.5*np.array([[1., -1.], [-1., 1.]])
+    M2 = 0.5*np.array([[1., -1.], [-1., 1.]])
     M = [M1, M2]
     # time length for the evolution
     tspan = np.linspace(0., 50., 2000)
@@ -396,18 +396,18 @@ the eigenstates of $\sigma_3$ with respect to the eigenvalues $1$ and $-1$.
     # free Hamiltonian
     omega = 1.0
     sx = [0. 1.; 1. 0.0im]
-	sy = [0. -im; im 0.]
-	sz = [1. 0.0im; 0. -1.]
+    sy = [0. -im; im 0.]
+    sz = [1. 0.0im; 0. -1.]
     H0 = 0.5*omega*sz
     # derivative of the free Hamiltonian on omega
     dH = [0.5*sz]
     # dissipation
     sp = [0. 1.; 0. 0.0im]
-	sm = [0. 0.; 1. 0.0im]
+    sm = [0. 0.; 1. 0.0im]
     decay = [[sp, 0.0], [sm, 0.1]]
     # measurement
     M1 = 0.5*[1.0+0.0im  1.; 1.  1.]
-	M2 = 0.5*[1.0+0.0im -1.; -1.  1.]
+    M2 = 0.5*[1.0+0.0im -1.; -1.  1.]
     M = [M1, M2]
     # time length for the evolution
     tspan = range(0., 50., length=2000)
@@ -652,8 +652,8 @@ $|0\rangle$ $(|1\rangle)$ the eigenstate of $\sigma_3$ with respect to the eigen
     # free Hamiltonian
     omega1, omega2, g = 1.0, 1.0, 0.1
     sx = np.array([[0., 1.], [1., 0.]])
-	sy = np.array([[0., -1.j], [1.j, 0.]]) 
-	sz = np.array([[1., 0.], [0., -1.]])
+    sy = np.array([[0., -1.j], [1.j, 0.]]) 
+    sz = np.array([[1., 0.], [0., -1.]])
     ide = np.array([[1., 0.], [0., 1.]])   
     H0 = omega1*np.kron(sz, ide)+omega2*np.kron(ide, sz)+g*np.kron(sx, sx)
     # derivatives of the free Hamiltonian on omega2 and g
@@ -693,8 +693,8 @@ $|0\rangle$ $(|1\rangle)$ the eigenstate of $\sigma_3$ with respect to the eigen
     # free Hamiltonian
     omega1, omega2, g = 1.0, 1.0, 0.1
     sx = [0. 1.; 1. 0.0im]
-	sy = [0. -im; im 0.]
-	sz = [1. 0.0im; 0. -1.]
+    sy = [0. -im; im 0.]
+    sz = [1. 0.0im; 0. -1.]
     H0 = omega1*kron(sz, I(2)) + omega2*kron(I(2), sz) + g*kron(sx, sx)
     # derivatives of the free Hamiltonian with respect to omega2 and g
     dH = [kron(I(2), sz), kron(sx, sx)]
@@ -727,9 +727,13 @@ $|0\rangle$ $(|1\rangle)$ the eigenstate of $\sigma_3$ with respect to the eigen
 ## **Bayesian Cramér-Rao bounds**
 The Bayesion version of the classical Fisher information (matrix) and quantum Fisher information 
 (matrix) can be calculated by <br>
-<center> $\mathcal{I}_{\mathrm{Bayes}}=\int p(\textbf{x})\mathcal{I}\mathrm{d}\textbf{x}$ </center> <br>
+$$
+\mathcal{I}_{\mathrm{Bayes}}=\int p(\textbf{x})\mathcal{I}\mathrm{d}\textbf{x}
+$$
 and <br>
-<center> $\mathcal{F}_{\mathrm{Bayes}}=\int p(\textbf{x})\mathcal{F}\mathrm{d}\textbf{x},$</center> <br>
+$$
+\mathcal{F}_{\mathrm{Bayes}}=\int p(\textbf{x})\mathcal{F}\mathrm{d}\textbf{x},
+$$
 where $p(\textbf{x})$ is the prior distribution, $\mathcal{I}$ and $\mathcal{F}$ are CFI (CFIM) 
 and QFI (QFIM) of all types, respectively.
 
@@ -865,16 +869,20 @@ on the first type of the BQCRB, it can be realized numerically via
 
 Van Trees in 1968 [[10]](#vanTrees1968) provides a well used Bayesian version of Cramér-Rao 
 bound known as Van Trees bound (VTB). 
-<center> $\mathrm{cov}(\hat{\textbf{x}},\{\Pi_y\})\geq \left(\mathcal{I}_{\mathrm{prior}}
-+\mathcal{I}_{\mathrm{Bayes}}\right)^{-1},$ </center>  
+$$
+\mathrm{cov}(\hat{\textbf{x}},\{\Pi_y\})\geq \left(\mathcal{I}_{\mathrm{prior}}
++\mathcal{I}_{\mathrm{Bayes}}\right)^{-1},
+$$  
 
 where $\mathcal{I}_{\mathrm{prior}}=\int p(\textbf{x})\mathcal{I}_{p}\mathrm{d}\textbf{x}$ 
 is the CFIM for $p(\textbf{x})$ and $\mathcal{I}_{\mathrm{Bayes}}$ is the average of the CFIM.
 
 The quantum version (QVTB) provided by Tsang, Wiseman 
 and Caves [[12]](#Tsang2011). 
-<center> $\mathrm{cov}(\hat{\textbf{x}},\{\Pi_y\})\geq \left(\mathcal{I}_{\mathrm{prior}}
-+\mathcal{F}_{\mathrm{Bayes}}\right)^{-1}$ </center>  
+$$
+\mathrm{cov}(\hat{\textbf{x}},\{\Pi_y\})\geq \left(\mathcal{I}_{\mathrm{prior}}
++\mathcal{F}_{\mathrm{Bayes}}\right)^{-1},
+$$  
 
 with $\mathcal{F}_{\mathrm{Bayes}}$ the average of the QFIM of all types.
 
@@ -1022,8 +1030,8 @@ $\mathrm{erf}(x):=\frac{2}{\sqrt{\pi}}\int^x_0 e^{-t^2}\mathrm{d}t$ the error fu
 
     B, omega0 = 0.5*pi, 1.0
     sx = [0. 1.; 1. 0.0im]
-	sy = [0. -im; im 0.]
-	sz = [1. 0.0im; 0. -1.]
+    sy = [0. -im; im 0.]
+    sz = [1. 0.0im; 0. -1.]
     # initial state
     rho0 = 0.5*ones(2, 2)
     # prior distribution
@@ -1090,8 +1098,8 @@ value of $\textbf{x}$ can be evaluated by
     measure (POVM). In QuanEstimation, a set of rank-one symmetric informationally complete POVM 
     (SIC-POVM) is used when `M=[]`. SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM 
     fiducial state which can be downloaded from [here](http://www.physics.umb.edu/Research/QBism/solutions.html). 
-        `eatimator` in `Bayes()` representing the estimators which is defaulted by the mean value of the 
-    paramters. Also, it can be set as `MAP`. The posterior distributions (likelihood function) in the 
+        `estimator` in `Bayes()` representing the estimators which is defaulted by the mean value of the 
+    parameters. Also, it can be set as `MAP`. The posterior distributions (likelihood function) in the 
     final iteration and the estimated values in all iterations will be saved in "pout.npy" ("Lout.npy") 
     and "xout.npy" if `savefile=False`. However, if the users want to save all the posterior 
     distributions (likelihood function) and the estimated values in all iterations, the variable 
@@ -1110,8 +1118,8 @@ value of $\textbf{x}$ can be evaluated by
     measure (POVM). In QuanEstimation, a set of rank-one symmetric informationally complete POVM 
     (SIC-POVM) is used when `M=missing`. SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM 
     fiducial state which can be downloaded from [here](http://www.physics.umb.edu/Research/QBism/solutions.html). 
-        `eatimator` in `Bayes()` representing the estimators which is defaulted by the mean value of the 
-    paramters. Also, it can be set as `MAP`. The posterior distributions (likelihood function) in the 
+        `estimator` in `Bayes()` representing the estimators which is defaulted by the mean value of the 
+    parameters. Also, it can be set as `MAP`. The posterior distributions (likelihood function) in the 
     final iteration and the estimated values in all iterations will be saved in "pout.csv" ("Lout.csv") 
     and "xout.csv" if `savefile=false`. However, if the users want to save all the posterior 
     distributions (likelihood function) and the estimated values in all iterations, the variable 
@@ -1198,13 +1206,13 @@ $[0, \pi/2]$.
 
     B, omega0 = pi/2.0, 1.0
     sx = [0. 1.; 1. 0.0im]
-	sy = [0. -im; im 0.]
-	sz = [1. 0.0im; 0. -1.]
+    sy = [0. -im; im 0.]
+    sz = [1. 0.0im; 0. -1.]
     # initial state
     rho0 = 0.5*ones(2, 2)
     # measurement 
     M1 = 0.5*[1.0+0.0im  1.; 1.  1.]
-	M2 = 0.5*[1.0+0.0im -1.; -1.  1.]
+    M2 = 0.5*[1.0+0.0im -1.; -1.  1.]
     M = [M1, M2]
     # prior distribution
     x = range(0., stop=0.5*pi, length=100) |>Vector
@@ -1353,13 +1361,13 @@ $[0, \pi/2]$.
 
     B, omega0 = pi/2.0, 1.0
     sx = [0. 1.; 1. 0.0im]
-	sy = [0. -im; im 0.]
-	sz = [1. 0.0im; 0. -1.]
+    sy = [0. -im; im 0.]
+    sz = [1. 0.0im; 0. -1.]
     # initial state
     rho0 = 0.5*ones(2, 2)
     # measurement 
     M1 = 0.5*[1.0+0.0im  1.; 1.  1.]
-	M2 = 0.5*[1.0+0.0im -1.; -1.  1.]
+    M2 = 0.5*[1.0+0.0im -1.; -1.  1.]
     M = [M1, M2]
     # prior distribution
     x = range(0., stop=0.5*pi, length=100) |>Vector
@@ -1456,3 +1464,5 @@ Estimation of Gaussian quantum states,
 <a id="Robert2007">[14]</a> 
 C. P. Robert,
 *The Bayesian Choice* (Berlin: Springer, 2007).
+
+**See also**: [Control optimization](guide_Copt.md), [State optimization](guide_Sopt.md), [Measurement optimization](guide_Mopt.md), [Comprehensive optimization](guide_Compopt.md) — use the bounds as objective functions to search for optimal quantum metrological schemes.

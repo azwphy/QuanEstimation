@@ -1,5 +1,5 @@
 import pytest
-from quanestimation.Resource.Resource import (
+from quanestimation.base.Resource.Resource import (
     SpinSqueezing, 
     TargetTime
 )

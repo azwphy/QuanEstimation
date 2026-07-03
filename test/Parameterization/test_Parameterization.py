@@ -1,8 +1,8 @@
 # import pytest
 import pytest
 import numpy as np
-from quanestimation.Parameterization.NonDynamics import Kraus
-from quanestimation.Parameterization.GeneralDynamics import Lindblad
+from quanestimation.base.Parameterization.NonDynamics import Kraus
+from quanestimation.base.Parameterization.GeneralDynamics import Lindblad
 
 def test_Kraus() -> None:
     """
@@ -229,3 +229,49 @@ def test_Lindblad() -> None:
 #         [0.25697573 + 0.40021598j, 0.54758129 + 0.j]
 #     ])
 #     assert np.allclose(final_state[-1], expected_final_state, atol=1e-6)
+
+
+# --- Phase 4.11 regression tests (Julia @testset parity) ---
+
+
+def test_41_ode_tolerance() -> None:
+    """#41: Expm and Ode dynamics must agree within 1e-2.
+
+    来源: test_lindblad.jl @testset "#41"
+    """
+    rho0 = np.eye(2, dtype=np.complex128) * 0.5
+    sz = np.array([[1.0, 0.0], [0.0, -1.0]], dtype=np.complex128)
+    sx = np.array([[0.0, 1.0], [1.0, 0.0]], dtype=np.complex128)
+    H0 = 0.5 * sz
+    dH = [0.5 * sz]
+    tspan = np.linspace(0.0, 0.5, 20)
+    decay = [[sx, 0.1]]
+
+    dyn_e = Lindblad(tspan, rho0, H0, dH, decay)
+    rho_e, _ = dyn_e.expm()
+
+    dyn_o = Lindblad(tspan, rho0, H0, dH, decay)
+    rho_o, _ = dyn_o.ode()
+
+    diff = np.linalg.norm(rho_e[-1] - rho_o[-1])
+    assert diff < 1e-2
+
+
+def test_42_zero_decay_threshold() -> None:
+    """#42: Near-zero decay rate must not break density matrix properties.
+
+    来源: test_lindblad.jl @testset "#42"
+    """
+    rho0 = np.eye(2, dtype=np.complex128) * 0.5
+    sz = np.array([[1.0, 0.0], [0.0, -1.0]], dtype=np.complex128)
+    sx = np.array([[0.0, 1.0], [1.0, 0.0]], dtype=np.complex128)
+    H0 = 0.5 * sz
+    dH = [0.5 * sz]
+    tspan = np.linspace(0.0, 0.5, 20)
+    decay = [[sx, 0.0], [sz, 1e-8]]
+
+    dyn = Lindblad(tspan, rho0, H0, dH, decay)
+    rho, _ = dyn.expm()
+    for r in rho:
+        assert np.all(np.linalg.eigvalsh(r) >= -1e-14)
+        assert np.allclose(r, r.conj().T, atol=1e-14)

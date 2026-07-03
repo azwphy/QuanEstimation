@@ -1,8 +1,8 @@
 # import pytest
 import numpy as np
 from scipy.integrate import simpson
-from quanestimation.BayesianBound.ZivZakai import QZZB
-from quanestimation.Parameterization.GeneralDynamics import Lindblad
+from quanestimation.base.BayesianBound.ZivZakai import QZZB
+from quanestimation.base.Parameterization.GeneralDynamics import Lindblad
 
 def test_ZivZakai() -> None:
     # initial state

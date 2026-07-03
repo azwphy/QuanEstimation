@@ -9,9 +9,6 @@ docs_dir: docs/src
 
 # extra_javascript: []
 extra_css:
-      - css/style.css
-      - css/material.css
-      - css/mkdocstrings.css
       - css/extra.css
       - css/julia_api.css
 
@@ -44,7 +41,6 @@ markdown_extensions:
 
 
 extra_javascript:
-      - javascripts/mathjax.js
       - javascripts/mathjaxhelper.js
       - https://polyfill.io/v3/polyfill.min.js?features=es6
       - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
@@ -81,7 +77,7 @@ plugins:
             default_handler: python
             handlers:
                   python:
-                        paths: [src]
+                        paths: [.]
 nav:
       - "Home": index.md
       - "Installation": installation.md
@@ -95,11 +91,13 @@ nav:
             - "Measurement optimization": guide/guide_Mopt.md
             - "Comprehensive optimization": guide/guide_Compopt.md
             - "Adaptive measurement schemes": guide/guide_adaptive.md
+            - "Python-Julia calling patterns": guide/guide_pyju.md
             - "Output files": guide/output_files.md
       - "API documentation": 
             - "Python": 
                   - "Classes": API/python/classes.md
                   - "Functions": API/python/functions.md
+                  - "NV Magnetometer": API/python/nv.md
             - "Julia": API/julia/api.md
       - "Examples": examples.md
       - "Citing": citing.md

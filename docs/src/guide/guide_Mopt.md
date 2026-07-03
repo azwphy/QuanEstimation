@@ -37,7 +37,7 @@ differential evolution (DE) [[2]](#Storn1997), and automatic differentiation (AD
     below.
 
     If the dynamics of the system can be described by the master equation, then the dynamics data 
-    `tspan`, `rho0`, `H0` and `dH` shoule be input. `tspan` is the time length for the evolution, 
+    `tspan`, `rho0`, `H0` and `dH` should be input. `tspan` is the time length for the evolution, 
     `rho0` represents the density matrix of the initial state, `H0` and `dH` are the free 
     Hamiltonian and its derivatives on the unknown parameters to be estimated. `H0` is a matrix 
     when the free Hamiltonian is time-independent and a list of matrices with the length equal to 
@@ -75,7 +75,7 @@ differential evolution (DE) [[2]](#Storn1997), and automatic differentiation (AD
     ensure the reproducibility of results.
     
     If the dynamics of the system can be described by the master equation, then the dynamics data 
-    `tspan`, `rho0`, `H0` and `dH` shoule be input. `tspan` is the time length for the evolution, 
+    `tspan`, `rho0`, `H0` and `dH` should be input. `tspan` is the time length for the evolution, 
     `rho0` represents the density matrix of the initial state, `H0` and `dH` are the free 
     Hamiltonian and its derivatives on the unknown parameters to be estimated. `H0` is a matrix 
     when the free Hamiltonian is time-independent and a list of matrices with the length equal to 
@@ -223,12 +223,12 @@ The code for measurement optimization with PSO is as follows
         dim = 6
         # generation of the entry of `measurement0`
         C = [ComplexF64[] for _ in 1:dim]
-		for i in 1:dim
-			r_ini = 2*rand(dim) - ones(dim)
-			r = r_ini/norm(r_ini)
-			ϕ = 2pi*rand(dim)
-			C[i] = [r*exp(im*ϕ) for (r,ϕ) in zip(r,ϕ)] 
-		end
+        for i in 1:dim
+            r_ini = 2*rand(dim) - ones(dim)
+            r = r_ini/norm(r_ini)
+            ϕ = 2pi*rand(dim)
+            C[i] = [r*exp(im*ϕ) for (r,ϕ) in zip(r,ϕ)] 
+        end
         C = QuanEstimation.gramschmidt(C)
         measurement0 = ([C],)
         ```
@@ -383,15 +383,15 @@ $1$ $(-1)$.
     # free Hamiltonian
     omega = 1.0
     sx = np.array([[0., 1.], [1., 0.]])
-	sy = np.array([[0., -1.j], [1.j, 0.]]) 
-	sz = np.array([[1., 0.], [0., -1.]])
+    sy = np.array([[0., -1.j], [1.j, 0.]]) 
+    sz = np.array([[1., 0.], [0., -1.]])
     H0 = 0.5*omega*sz
     # derivative of the free Hamiltonian on omega
     dH = [0.5*sz]
     # dissipation
     sp = np.array([[0., 1.], [0., 0.]])  
-	sm = np.array([[0., 0.], [1., 0.]]) 
-	decay = [[sp, 0.], [sm, 0.1]]
+    sm = np.array([[0., 0.], [1., 0.]]) 
+    decay = [[sp, 0.], [sm, 0.1]]
     # generation of a set of POVM basis
     dim = np.shape(rho0)[0]
     POVM_basis = SIC(dim)
@@ -400,81 +400,81 @@ $1$ $(-1)$.
     ```
     === "projection"
         === "DE"
-		    ``` py
+            ``` py
             M_num = dim
             # measurement optimization algorithm: DE
-		    DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
+            DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
                         "c":1.0, "cr":0.5, "seed":1234}
-		    m = MeasurementOpt(mtype="projection", minput=[], savefile=False, \
+            m = MeasurementOpt(mtype="projection", minput=[], savefile=False, \
                                method="DE", **DE_paras)
-		    ```
+            ```
         === "PSO"
-		    ``` py
+            ``` py
             M_num = dim
             # measurement optimization algorithm: PSO
-		    PSO_paras = {"p_num":10, "measurement0":[], \
+            PSO_paras = {"p_num":10, "measurement0":[], \
                          "max_episode":[1000,100], "c0":1.0, \
-					    "c1":2.0, "c2":2.0, "seed":1234}
-		    m = MeasurementOpt(mtype="projection", minput=[], savefile=False, \
+                        "c1":2.0, "c2":2.0, "seed":1234}
+            m = MeasurementOpt(mtype="projection", minput=[], savefile=False, \
                                method="PSO", **PSO_paras)
-		    ```
+            ```
     === "LC"
         === "DE"
-		    ``` py
+            ``` py
             M_num = 2
             # measurement optimization algorithm: DE
-		    DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
-				        "c":1.0, "cr":0.5, "seed":1234}
-		    m = MeasurementOpt(mtype="input", minput=["LC", POVM_basis, M_num], \
+            DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
+                        "c":1.0, "cr":0.5, "seed":1234}
+            m = MeasurementOpt(mtype="input", minput=["LC", POVM_basis, M_num], \
                                savefile=False, method="DE", **DE_paras)
-		    ```
+            ```
         === "PSO"
-		    ``` py
+            ``` py
             M_num = 2
             # measurement optimization algorithm: PSO
-		    PSO_paras = {"p_num":10, "measurement0":[], "max_episode":[1000,100], \
-					     "c0":1.0, "c1":2.0, "c2":2.0, "seed":1234}
-		    m = MeasurementOpt(mtype="input", minput=["LC", POVM_basis, M_num], \
+            PSO_paras = {"p_num":10, "measurement0":[], "max_episode":[1000,100], \
+                         "c0":1.0, "c1":2.0, "c2":2.0, "seed":1234}
+            m = MeasurementOpt(mtype="input", minput=["LC", POVM_basis, M_num], \
                                savefile=False, method="PSO", **PSO_paras)
-		    ```
+            ```
         === "AD"
-		    ``` py
+            ``` py
             M_num = 2
             # measurement optimization algorithm: AD
-		    AD_paras = {"Adam":False, "measurement0":[], "max_episode":300, \
+            AD_paras = {"Adam":False, "measurement0":[], "max_episode":300, \
                         "epsilon":0.01, "beta1":0.90, "beta2":0.99}
             m = MeasurementOpt(mtype="input", minput=["LC", POVM_basis, M_num], \
                                savefile=False, method="AD", **AD_paras)
-		    ```
+            ```
     === "rotation"
         === "DE"
-		    ``` py
+            ``` py
             M_num = dim
             # measurement optimization algorithm: DE
-		    DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
+            DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
                         "c":1.0, "cr":0.5, "seed":1234}
-		    m = MeasurementOpt(mtype="input", minput=["rotation", POVM_basis], \
+            m = MeasurementOpt(mtype="input", minput=["rotation", POVM_basis], \
                                savefile=False, method="DE", **DE_paras)
-		    ```
+            ```
         === "PSO"
-		    ``` py
+            ``` py
             M_num = dim
             # measurement optimization algorithm: PSO
-		    PSO_paras = {"p_num":10, "measurement0":[], \
+            PSO_paras = {"p_num":10, "measurement0":[], \
                          "max_episode":[1000,100], "c0":1.0, \
-					     "c1":2.0, "c2":2.0, "seed":1234}
-		    m = MeasurementOpt(mtype="input", minput=["rotation", POVM_basis], \
+                         "c1":2.0, "c2":2.0, "seed":1234}
+            m = MeasurementOpt(mtype="input", minput=["rotation", POVM_basis], \
                                savefile=False, method="PSO", **PSO_paras)
-		    ```
+            ```
         === "AD"
-		    ``` py
+            ``` py
             M_num = dim
             # measurement optimization algorithm: AD
-		    AD_paras = {"Adam":False, "measurement0":[], "max_episode":300, \
+            AD_paras = {"Adam":False, "measurement0":[], "max_episode":300, \
                         "epsilon":0.01, "beta1":0.90, "beta2":0.99}
             m = MeasurementOpt(mtype="input", minput=["rotation", POVM_basis], \
                                savefile=False, method="AD", **AD_paras)
-		    ```
+            ```
     ``` py
     # input the dynamics data
     m.dynamics(tspan, rho0, H0, dH, decay=decay, dyn_method="expm")
@@ -499,14 +499,14 @@ $1$ $(-1)$.
     # free Hamiltonian
     omega = 1.0
     sx = [0. 1.; 1. 0.0im]
-	sy = [0. -im; im 0.]
-	sz = [1. 0.0im; 0. -1.]
+    sy = [0. -im; im 0.]
+    sz = [1. 0.0im; 0. -1.]
     H0 = 0.5*omega*sz
     # derivative of the free Hamiltonian on omega
     dH = [0.5*sz]
     # dissipation
     sp = [0. 1.; 0. 0.0im]
-	sm = [0. 0.; 1. 0.0im]
+    sm = [0. 0.; 1. 0.0im]
     decay = [[sp, 0.], [sm, 0.1]]
     # generation of a set of POVM basis
     dim = size(rho0, 1)
@@ -647,27 +647,27 @@ Here three types of measurement optimization are considerd, projective measureme
     rho0[0][0], rho0[0][4], rho0[4][0], rho0[4][4] = 0.5, 0.5, 0.5, 0.5
     # free Hamiltonian
     sx = np.array([[0., 1.],[1., 0.]])
-	sy = np.array([[0., -1.j],[1.j, 0.]]) 
-	sz = np.array([[1., 0.],[0., -1.]])
-	ide2 = np.array([[1., 0.],[0., 1.]])
-	s1 = np.array([[0., 1., 0.],[1., 0., 1.],[0., 1., 0.]])/np.sqrt(2)
-	s2 = np.array([[0., -1.j, 0.],[1.j, 0., -1.j],[0., 1.j, 0.]])/np.sqrt(2)
-	s3 = np.array([[1., 0., 0.],[0., 0., 0.],[0., 0., -1.]])
-	ide3 = np.array([[1., 0., 0.],[0., 1., 0.],[0., 0., 1.]])
-	I1, I2, I3 = np.kron(ide3, sx), np.kron(ide3, sy), np.kron(ide3, sz)
-	S1, S2, S3 = np.kron(s1, ide2), np.kron(s2, ide2), np.kron(s3, ide2)
-	B1, B2, B3 = 5.0e-4, 5.0e-4, 5.0e-4
+    sy = np.array([[0., -1.j],[1.j, 0.]]) 
+    sz = np.array([[1., 0.],[0., -1.]])
+    ide2 = np.array([[1., 0.],[0., 1.]])
+    s1 = np.array([[0., 1., 0.],[1., 0., 1.],[0., 1., 0.]])/np.sqrt(2)
+    s2 = np.array([[0., -1.j, 0.],[1.j, 0., -1.j],[0., 1.j, 0.]])/np.sqrt(2)
+    s3 = np.array([[1., 0., 0.],[0., 0., 0.],[0., 0., -1.]])
+    ide3 = np.array([[1., 0., 0.],[0., 1., 0.],[0., 0., 1.]])
+    I1, I2, I3 = np.kron(ide3, sx), np.kron(ide3, sy), np.kron(ide3, sz)
+    S1, S2, S3 = np.kron(s1, ide2), np.kron(s2, ide2), np.kron(s3, ide2)
+    B1, B2, B3 = 5.0e-4, 5.0e-4, 5.0e-4
     # All numbers are divided by 100 in this example 
-    # for better calculation accurancy
+    # for better calculation accuracy
     cons = 100
-	D = (2*np.pi*2.87*1000)/cons
-	gS = (2*np.pi*28.03*1000)/cons
-	gI = (2*np.pi*4.32)/cons
-	A1 = (2*np.pi*3.65)/cons
-	A2 = (2*np.pi*3.03)/cons
-	H0 = D*np.kron(np.dot(s3, s3), ide2) + gS*(B1*S1+B2*S2+B3*S3) \
-		 + gI*(B1*I1+B2*I2+B3*I3) + A1*(np.kron(s1, sx) + np.kron(s2, sy)) \
-		 + A2*np.kron(s3, sz)
+    D = (2*np.pi*2.87*1000)/cons
+    gS = (2*np.pi*28.03*1000)/cons
+    gI = (2*np.pi*4.32)/cons
+    A1 = (2*np.pi*3.65)/cons
+    A2 = (2*np.pi*3.03)/cons
+    H0 = D*np.kron(np.dot(s3, s3), ide2) + gS*(B1*S1+B2*S2+B3*S3) \
+         + gI*(B1*I1+B2*I2+B3*I3) + A1*(np.kron(s1, sx) + np.kron(s2, sy)) \
+         + A2*np.kron(s3, sz)
     # derivatives of the free Hamiltonian on B1, B2, and B3
     dH = [gS*S1+gI*I1, gS*S2+gI*I2, gS*S3+gI*I3]
     # control Hamiltonians 
@@ -683,81 +683,81 @@ Here three types of measurement optimization are considerd, projective measureme
     ```
     === "projection"
         === "DE"
-		    ``` py
+            ``` py
             M_num = dim
             # measurement optimization algorithm: DE
-		    DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
+            DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
                         "c":1.0, "cr":0.5, "seed":1234}
-		    m = MeasurementOpt(mtype="projection", minput=[], savefile=False, \
+            m = MeasurementOpt(mtype="projection", minput=[], savefile=False, \
                                method="DE", **DE_paras)
-		    ```
+            ```
         === "PSO"
-		    ``` py
+            ``` py
             M_num = dim
             # measurement optimization algorithm: PSO
-		    PSO_paras = {"p_num":10, "measurement0":[], \
+            PSO_paras = {"p_num":10, "measurement0":[], \
                          "max_episode":[1000,100], "c0":1.0, \
-					    "c1":2.0, "c2":2.0, "seed":1234}
-		    m = MeasurementOpt(mtype="projection", minput=[], savefile=False, \
+                        "c1":2.0, "c2":2.0, "seed":1234}
+            m = MeasurementOpt(mtype="projection", minput=[], savefile=False, \
                                method="PSO", **PSO_paras)
-		    ```
+            ```
     === "LC"
         === "DE"
-		    ``` py
+            ``` py
             M_num = 4
             # measurement optimization algorithm: DE
-		    DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
-				        "c":1.0, "cr":0.5, "seed":1234}
-		    m = MeasurementOpt(mtype="input", minput=["LC", POVM_basis, M_num], \
+            DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
+                        "c":1.0, "cr":0.5, "seed":1234}
+            m = MeasurementOpt(mtype="input", minput=["LC", POVM_basis, M_num], \
                                savefile=False, method="DE", **DE_paras)
-		    ```
+            ```
         === "PSO"
-		    ``` py
+            ``` py
             M_num = 4
             # measurement optimization algorithm: PSO
-		    PSO_paras = {"p_num":10, "measurement0":[], "max_episode":[1000,100], \
-					     "c0":1.0, "c1":2.0, "c2":2.0, "seed":1234}
-		    m = MeasurementOpt(mtype="input", minput=["LC", POVM_basis, M_num], \
+            PSO_paras = {"p_num":10, "measurement0":[], "max_episode":[1000,100], \
+                         "c0":1.0, "c1":2.0, "c2":2.0, "seed":1234}
+            m = MeasurementOpt(mtype="input", minput=["LC", POVM_basis, M_num], \
                                savefile=False, method="PSO", **PSO_paras)
-		    ```
+            ```
         === "AD"
-		    ``` py
+            ``` py
             M_num = 4
             # measurement optimization algorithm: AD
-		    AD_paras = {"Adam":False, "measurement0":[], "max_episode":300, \
+            AD_paras = {"Adam":False, "measurement0":[], "max_episode":300, \
                         "epsilon":0.01, "beta1":0.90, "beta2":0.99}
             m = MeasurementOpt(mtype="input", minput=["LC", POVM_basis, M_num], \
                                savefile=False, method="AD", **AD_paras)
-		    ```
+            ```
     === "rotation"
         === "DE"
-		    ``` py
+            ``` py
             M_num = dim
             # measurement optimization algorithm: DE
-		    DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
+            DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
                         "c":1.0, "cr":0.5, "seed":1234}
-		    m = MeasurementOpt(mtype="input", minput=["rotation", POVM_basis], \
+            m = MeasurementOpt(mtype="input", minput=["rotation", POVM_basis], \
                                savefile=False, method="DE", **DE_paras)
-		    ```
+            ```
         === "PSO"
-		    ``` py
+            ``` py
             M_num = dim
             # measurement optimization algorithm: PSO
-		    PSO_paras = {"p_num":10, "measurement0":[], \
+            PSO_paras = {"p_num":10, "measurement0":[], \
                          "max_episode":[1000,100], "c0":1.0, \
-					     "c1":2.0, "c2":2.0, "seed":1234}
-		    m = MeasurementOpt(mtype="input", minput=["rotation", POVM_basis], \
+                         "c1":2.0, "c2":2.0, "seed":1234}
+            m = MeasurementOpt(mtype="input", minput=["rotation", POVM_basis], \
                                savefile=False, method="PSO", **PSO_paras)
-		    ```
+            ```
         === "AD"
-		    ``` py
+            ``` py
             M_num = dim
             # measurement optimization algorithm: AD
-		    AD_paras = {"Adam":False, "measurement0":[], "max_episode":300, \
+            AD_paras = {"Adam":False, "measurement0":[], "max_episode":300, \
                         "epsilon":0.01, "beta1":0.90, "beta2":0.99}
             m = MeasurementOpt(mtype="input", minput=["rotation", POVM_basis], \
                                savefile=False, method="AD", **AD_paras)
-		    ```
+            ```
     ``` py
     # input the dynamics data
     m.dynamics(tspan, rho0, H0, dH, decay=decay, dyn_method="expm")
@@ -781,24 +781,24 @@ Here three types of measurement optimization are considerd, projective measureme
     rho0[1:4:5, 1:4:5] .= 0.5
     # Hamiltonian
     sx = [0. 1.; 1. 0.]
-	sy = [0. -im; im 0.]
-	sz = [1. 0.; 0. -1.]
-	s1 = [0. 1. 0.; 1. 0. 1.; 0. 1. 0.]/sqrt(2)
-	s2 = [0. -im 0.; im 0. -im; 0. im 0.]/sqrt(2)
-	s3 = [1. 0. 0.; 0. 0. 0.; 0. 0. -1.]
-	Is = I1, I2, I3 = [kron(I(3), sx), kron(I(3), sy), kron(I(3), sz)]
-	S = S1, S2, S3 = [kron(s1, I(2)), kron(s2, I(2)), kron(s3, I(2))]
-	B = B1, B2, B3 = [5.0e-4, 5.0e-4, 5.0e-4]
+    sy = [0. -im; im 0.]
+    sz = [1. 0.; 0. -1.]
+    s1 = [0. 1. 0.; 1. 0. 1.; 0. 1. 0.]/sqrt(2)
+    s2 = [0. -im 0.; im 0. -im; 0. im 0.]/sqrt(2)
+    s3 = [1. 0. 0.; 0. 0. 0.; 0. 0. -1.]
+    Is = I1, I2, I3 = [kron(I(3), sx), kron(I(3), sy), kron(I(3), sz)]
+    S = S1, S2, S3 = [kron(s1, I(2)), kron(s2, I(2)), kron(s3, I(2))]
+    B = B1, B2, B3 = [5.0e-4, 5.0e-4, 5.0e-4]
     # All numbers are divided by 100 in this example 
-    # for better calculation accurancy
+    # for better calculation accuracy
     cons = 100
-	D = (2pi*2.87*1000)/cons
-	gS = (2pi*28.03*1000)/cons
-	gI = (2pi*4.32)/cons
-	A1 = (2pi*3.65)/cons
-	A2 = (2pi*3.03)/cons
-	H0 = sum([D*kron(s3^2, I(2)), sum(gS*B.*S), sum(gI*B.*Is),
-          	  A1*(kron(s1, sx) + kron(s2, sy)), A2*kron(s3, sz)])
+    D = (2pi*2.87*1000)/cons
+    gS = (2pi*28.03*1000)/cons
+    gI = (2pi*4.32)/cons
+    A1 = (2pi*3.65)/cons
+    A2 = (2pi*3.03)/cons
+    H0 = sum([D*kron(s3^2, I(2)), sum(gS*B.*S), sum(gI*B.*Is),
+                A1*(kron(s1, sx) + kron(s2, sy)), A2*kron(s3, sz)])
     # derivatives of the free Hamiltonian on B1, B2 and B3
     dH = gS*S+gI*Is
     # control Hamiltonians 
@@ -955,73 +955,73 @@ the eigenstate of $\sigma_3$ (Pauli matrix) with respect to the eigenvalue $1$ $
     ```
     === "projection"
         === "DE"
-		    ``` py
+            ``` py
             # measurement optimization algorithm: DE
-		    DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
+            DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
                         "c":1.0, "cr":0.5, "seed":1234}
-		    m = MeasurementOpt(mtype="projection", minput=[], savefile=False, \
+            m = MeasurementOpt(mtype="projection", minput=[], savefile=False, \
                                method="DE", **DE_paras)
-		    ```
+            ```
         === "PSO"
-		    ``` py
+            ``` py
             # measurement optimization algorithm: PSO
-		    PSO_paras = {"p_num":10, "measurement0":[], \
+            PSO_paras = {"p_num":10, "measurement0":[], \
                          "max_episode":[1000,100], "c0":1.0, \
-					    "c1":2.0, "c2":2.0, "seed":1234}
-		    m = MeasurementOpt(mtype="projection", minput=[], savefile=False, \
+                        "c1":2.0, "c2":2.0, "seed":1234}
+            m = MeasurementOpt(mtype="projection", minput=[], savefile=False, \
                                method="PSO", **PSO_paras)
-		    ```
+            ```
     === "LC"
         === "DE"
-		    ``` py
+            ``` py
             # measurement optimization algorithm: DE
-		    DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
-				        "c":1.0, "cr":0.5, "seed":1234}
-		    m = MeasurementOpt(mtype="input", minput=["LC", POVM_basis, 2], \
+            DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
+                        "c":1.0, "cr":0.5, "seed":1234}
+            m = MeasurementOpt(mtype="input", minput=["LC", POVM_basis, 2], \
                                savefile=False, method="DE", **DE_paras)
-		    ```
+            ```
         === "PSO"
-		    ``` py
+            ``` py
             # measurement optimization algorithm: PSO
-		    PSO_paras = {"p_num":10, "measurement0":[], "max_episode":[1000,100], \
-					     "c0":1.0, "c1":2.0, "c2":2.0, "seed":1234}
-		    m = MeasurementOpt(mtype="input", minput=["LC", POVM_basis, 2], \
+            PSO_paras = {"p_num":10, "measurement0":[], "max_episode":[1000,100], \
+                         "c0":1.0, "c1":2.0, "c2":2.0, "seed":1234}
+            m = MeasurementOpt(mtype="input", minput=["LC", POVM_basis, 2], \
                                savefile=False, method="PSO", **PSO_paras)
-		    ```
+            ```
         === "AD"
-		    ``` py
+            ``` py
             # measurement optimization algorithm: AD
-		    AD_paras = {"Adam":False, "measurement0":[], "max_episode":300, \
+            AD_paras = {"Adam":False, "measurement0":[], "max_episode":300, \
                         "epsilon":0.01, "beta1":0.90, "beta2":0.99}
             m = MeasurementOpt(mtype="input", minput=["LC", POVM_basis, 2], \
                                savefile=False, method="AD", **AD_paras)
-		    ```
+            ```
     === "rotation"
         === "DE"
-		    ``` py
+            ``` py
             # measurement optimization algorithm: DE
-		    DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
+            DE_paras = {"p_num":10, "measurement0":[], "max_episode":1000, \
                         "c":1.0, "cr":0.5, "seed":1234}
-		    m = MeasurementOpt(mtype="input", minput=["rotation", POVM_basis], \
+            m = MeasurementOpt(mtype="input", minput=["rotation", POVM_basis], \
                                savefile=False, method="DE", **DE_paras)
-		    ```
+            ```
         === "PSO"
-		    ``` py
+            ``` py
             # measurement optimization algorithm: PSO
-		    PSO_paras = {"p_num":10, "measurement0":[], \
+            PSO_paras = {"p_num":10, "measurement0":[], \
                          "max_episode":[1000,100], "c0":1.0, \
-					     "c1":2.0, "c2":2.0, "seed":1234}
-		    m = MeasurementOpt(mtype="input", minput=["rotation", POVM_basis], \
+                         "c1":2.0, "c2":2.0, "seed":1234}
+            m = MeasurementOpt(mtype="input", minput=["rotation", POVM_basis], \
                                savefile=False, method="PSO", **PSO_paras)
-		    ```
+            ```
         === "AD"
-		    ``` py
+            ``` py
             # measurement optimization algorithm: AD
-		    AD_paras = {"Adam":False, "measurement0":[], "max_episode":300, \
+            AD_paras = {"Adam":False, "measurement0":[], "max_episode":300, \
                         "epsilon":0.01, "beta1":0.90, "beta2":0.99}
             m = MeasurementOpt(mtype="input", minput=["rotation", POVM_basis], \
                                savefile=False, method="AD", **AD_paras)
-		    ```
+            ```
     ``` py
     # input the dynamics data
     m.Kraus(rho0, K, dK)
@@ -1150,4 +1150,6 @@ Optimization over Continuous Spaces,
 A. G. Baydin, B. A. Pearlmutter, A. A. Radul, and J. M. Siskind,
 Automatic differentiation in machine learning: a survey,
 [J. Mach. Learn. Res. **18**, 1-43 (2018).](http://jmlr.org/papers/v18/17-468.html)
+
+**See also**: [Parameterization process](guide_dynamics.md) — construct the system dynamics. [Quantum metrological tools](guide_bounds.md) — the objective functions being optimized. [Output files](output_files.md) — how to load the saved `measurements.npy` results.
 

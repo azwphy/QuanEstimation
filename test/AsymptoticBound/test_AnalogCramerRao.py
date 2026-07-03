@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from quanestimation.AsymptoticBound.AnalogCramerRao import (
+from quanestimation.base.AsymptoticBound.AnalogCramerRao import (
     HCRB, 
     NHB
 )
