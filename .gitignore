@@ -172,3 +172,6 @@ mtspan.csv
 pout.npy
 xout.npy
 Lout.npy
+xout.csv
+y.csv
+pout.csv

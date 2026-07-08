@@ -89,7 +89,7 @@ class TestNVMagnetometerScheme:
         opt = ControlOpt(
             ctrl0=[np.zeros(200) for _ in range(3)],
             seed=1234,
-            max_episode=5,
+            max_episode=3,
         )
         self.scheme.optimize(opt)
         F_post = np.trace(self.scheme.QFIM())

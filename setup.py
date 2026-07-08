@@ -15,7 +15,7 @@ requirements = [
     "sympy>=1.9",
     "scipy>=1.7",
     "cvxpy>=1.2",
-    "juliacall>=0.9.26",
+    "juliacall>=0.9.35",
     "more_itertools>=8.12",
     "h5py>=3.6",
 ]

@@ -145,8 +145,6 @@ class NVMagnetometerScheme:
         from juliacall import Main as jl_main, convert as jlconvert
 
         jl_mod = _get_jl()
-        if algorithm is None:
-            algorithm = jl_mod.autoGRAPE()
         if objective is None:
             objective = jl_mod.QFIM_obj()
 
@@ -160,12 +158,16 @@ class NVMagnetometerScheme:
         ctrl_bound_jl = jlconvert(jl_main.Vector[jl_main.Float64], ctrl_bound)
 
         seed = getattr(opt, 'seed', 1234)
+        max_episode = getattr(opt, 'max_episode', 100)
 
         julia_opt = jl_mod.ControlOpt(
             ctrl=ctrl_jl if ctrl0 else None,
             ctrl_bound=ctrl_bound_jl,
             seed=seed,
         )
+
+        if algorithm is None:
+            algorithm = jl_mod.autoGRAPE(max_episode=max_episode)
 
         return getattr(jl_mod, "optimize!")(
             self._jl_scheme, julia_opt,
