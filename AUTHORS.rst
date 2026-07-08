@@ -5,7 +5,7 @@ Credits
 Development Lead
 ----------------
 
-* Jing Liu <liujing@hainanu.edu.cn>
+* Jing Liu <jing.liu@hainanu.edu.cn>
 
 Major developers
 ------------
