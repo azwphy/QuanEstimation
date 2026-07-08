@@ -12,6 +12,7 @@ jobs:
 
     env:
       PYTHON_JULIACALL_COMPILE: "no"
+      PYTHON_JULIACALL_HANDLE_SIGNALS: "yes"
 
     steps:
     - uses: actions/checkout@v4
@@ -21,26 +22,9 @@ jobs:
       with:
         python-version: '3.13'
 
-    - name: Cache Julia packages
-      uses: actions/cache@v4
-      env:
-        cache-name: cache-julia-packages
-      with:
-        path: ~/.julia
-        key: ${{ runner.os }}-julia-${{ hashFiles('**/Project.toml') }}
-        restore-keys: |
-          ${{ runner.os }}-julia-
-
     - uses: julia-actions/setup-julia@v2
       with:
         version: '1.12'
-
-    - name: Install Julia dependencies
-      run: |
-        julia -e 'using Pkg;
-                  Pkg.add(name="QuanEstimation", version="0.3.1");
-                  Pkg.add("PyCall");
-                  Pkg.precompile()'
 
     - name: Install dependencies
       run: |
