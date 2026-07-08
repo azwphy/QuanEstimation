@@ -64,7 +64,7 @@ def load_julia():
         )
     else:
         jl.Main.seval(
-            'import Pkg; Pkg.add(name="QuanEstimation", version="0.2.2")'
+            'import Pkg; Pkg.add(name="QuanEstimation", version="0.3.1")'
         )
 
     jl.Main.seval("using QuanEstimation, PythonCall")
