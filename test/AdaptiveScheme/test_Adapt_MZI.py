@@ -30,7 +30,16 @@ def test_adaptive_mzi() -> None:
     apt = Adapt_MZI(x, p, rho0)
     assert apt is not None
 
-    apt.offline("sharpness", method="DE", p_num=10, seed=1234,
-                max_episode=10, c=1.0, cr=0.5)
-    apt.offline("sharpness", method="PSO", p_num=10, seed=1234,
-                max_episode=10, c0=1.0, c1=2.0, c2=2.0)
+    apt.offline(
+        "sharpness", method="DE", p_num=10, seed=1234, max_episode=10, c=1.0, cr=0.5
+    )
+    apt.offline(
+        "sharpness",
+        method="PSO",
+        p_num=10,
+        seed=1234,
+        max_episode=10,
+        c0=1.0,
+        c1=2.0,
+        c2=2.0,
+    )

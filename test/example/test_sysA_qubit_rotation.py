@@ -18,9 +18,7 @@ def test_sysA_qubit_rotation() -> None:
         if isinstance(L, list):
             L = L[0]
         assert np.linalg.norm(L - L.conj().T) < 1e-14
-        assert np.allclose(
-            2.0 * drho[0], L @ rho + rho @ L, atol=1e-10
-        )
+        assert np.allclose(2.0 * drho[0], L @ rho + rho @ L, atol=1e-10)
 
         rho_h = (rho + rho.conj().T) / 2.0
         assert np.linalg.norm(rho_h - rho) < 1e-14

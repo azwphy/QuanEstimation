@@ -34,7 +34,9 @@ def test_dynamics_dH_not_list():
     rho0 = np.array([[0.5, 0], [0, 0.5]], dtype=np.complex128)
     tspan = np.linspace(0, 1, 20)
 
-    with pytest.raises(TypeError, match="The derivative of Hamiltonian should be a list"):
+    with pytest.raises(
+        TypeError, match="The derivative of Hamiltonian should be a list"
+    ):
         copt.dynamics(tspan, rho0, H0, dH=np.eye(2), Hc=[])
 
 
@@ -108,8 +110,10 @@ def test_cfim_full_pipeline():
     rho0 = np.array([[1, 0], [0, 0]], dtype=np.complex128)
     dH = [np.eye(2, dtype=np.complex128)]
     Hc = [np.eye(2, dtype=np.complex128)]
-    M = [np.array([[1, 0], [0, 0]], dtype=np.complex128),
-         np.array([[0, 0], [0, 1]], dtype=np.complex128)]
+    M = [
+        np.array([[1, 0], [0, 0]], dtype=np.complex128),
+        np.array([[0, 0], [0, 1]], dtype=np.complex128),
+    ]
     tspan = np.linspace(0, 1, 20)
 
     copt.dynamics(tspan, rho0, H0, dH, Hc)
@@ -153,8 +157,10 @@ def test_controlopt_cfim_run():
     rho0 = np.array([[1, 0], [0, 0]], dtype=np.complex128)
     dH = [np.eye(2, dtype=np.complex128)]
     Hc = [np.eye(2, dtype=np.complex128)]
-    M = [np.array([[1, 0], [0, 0]], dtype=np.complex128),
-         np.array([[0, 0], [0, 1]], dtype=np.complex128)]
+    M = [
+        np.array([[1, 0], [0, 0]], dtype=np.complex128),
+        np.array([[0, 0], [0, 1]], dtype=np.complex128),
+    ]
     tspan = np.linspace(0, 1, 20)
 
     copt.dynamics(tspan, rho0, H0, dH, Hc)

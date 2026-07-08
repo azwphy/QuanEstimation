@@ -106,8 +106,10 @@ def test_scene6_control_cfim():
     print("Scene 6: Control CFIM pipeline   ...", end=" ")
     copt = ControlOpt(method="GRAPE", Adam=True, max_episode=3, seed=1234)
     H0, dH, rho0, Hc, tspan = _qubit_setup()
-    M = [np.array([[1, 0], [0, 0]], dtype=np.complex128),
-         np.array([[0, 0], [0, 1]], dtype=np.complex128)]
+    M = [
+        np.array([[1, 0], [0, 0]], dtype=np.complex128),
+        np.array([[0, 0], [0, 1]], dtype=np.complex128),
+    ]
     copt.dynamics(tspan, rho0, H0, dH, Hc)
     copt.CFIM(M=M)
     assert copt.obj is not None, "CFIM objective not created"

@@ -85,9 +85,14 @@ class NVMagnetometerScheme:
         jl = _get_jl()
         kwargs = {}
         for name, val in [
-            ("D", D), ("gS", gS), ("gI", gI),
-            ("A1", A1), ("A2", A2),
-            ("B1", B1), ("B2", B2), ("B3", B3),
+            ("D", D),
+            ("gS", gS),
+            ("gI", gI),
+            ("A1", A1),
+            ("A2", A2),
+            ("B1", B1),
+            ("B2", B2),
+            ("B3", B3),
             ("γ", gamma),
         ]:
             if val is not None:
@@ -128,8 +133,7 @@ class NVMagnetometerScheme:
         """
         return _get_jl().HCRB(self._jl_scheme, **kwargs)
 
-    def optimize(self, opt, algorithm=None, objective=None,
-                 savefile=False):
+    def optimize(self, opt, algorithm=None, objective=None, savefile=False):
         """Run control optimization.
 
         Converts the Python ``ControlOpt`` instance to a Julia
@@ -148,17 +152,17 @@ class NVMagnetometerScheme:
         if objective is None:
             objective = jl_mod.QFIM_obj()
 
-        ctrl0 = getattr(opt, 'ctrl0', [])
+        ctrl0 = getattr(opt, "ctrl0", [])
         if ctrl0:
             ctrl_jl = jlconvert(jl_main.Vector[jl_main.Vector[jl_main.Float64]], ctrl0)
         else:
             ctrl_jl = None
 
-        ctrl_bound = getattr(opt, 'ctrl_bound', [-float('inf'), float('inf')])
+        ctrl_bound = getattr(opt, "ctrl_bound", [-float("inf"), float("inf")])
         ctrl_bound_jl = jlconvert(jl_main.Vector[jl_main.Float64], ctrl_bound)
 
-        seed = getattr(opt, 'seed', 1234)
-        max_episode = getattr(opt, 'max_episode', 100)
+        seed = getattr(opt, "seed", 1234)
+        max_episode = getattr(opt, "max_episode", 100)
 
         julia_opt = jl_mod.ControlOpt(
             ctrl=ctrl_jl if ctrl0 else None,
@@ -170,7 +174,8 @@ class NVMagnetometerScheme:
             algorithm = jl_mod.autoGRAPE(max_episode=max_episode)
 
         return getattr(jl_mod, "optimize!")(
-            self._jl_scheme, julia_opt,
+            self._jl_scheme,
+            julia_opt,
             algorithm=algorithm,
             objective=objective,
             savefile=savefile,

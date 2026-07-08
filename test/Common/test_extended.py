@@ -60,6 +60,7 @@ class TestBellState:
 
     def test_invalid(self):
         import pytest
+
         with pytest.raises(ValueError):
             BellState(0)
         with pytest.raises(ValueError):
