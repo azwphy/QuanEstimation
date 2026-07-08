@@ -26,6 +26,18 @@ jobs:
       with:
         version: '1.12'
 
+    - name: Patch OpenSSL version check
+      run: |
+        SITEDIR=$(python -c 'import site; print(site.getsitepackages()[0])')
+        cat > "$SITEDIR/sitecustomize.py" << 'PYEOF'
+        import ssl
+        import struct
+        # juliapkg restricts Julia to <=1.11 when OpenSSL < 3.5
+        if ssl.OPENSSL_VERSION_INFO[:2] < (3, 5):
+            ssl.OPENSSL_VERSION_INFO = (3, 5, 0, 0, 0)
+        PYEOF
+        python -c 'import ssl; print("OpenSSL version for juliapkg:", ssl.OPENSSL_VERSION_INFO)'
+
     - name: Install dependencies
       run: |
         pip install .[test]
