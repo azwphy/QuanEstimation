@@ -26,7 +26,7 @@ test_requirements = [
 
 setup(
     author="Jing Liu et al.",
-    author_email="liujing@hainanu.edu.cn ",
+    author_email="jing.liu@hainanu.edu.cn ",
     python_requires=">=3.10",
     classifiers=[
         "Development Status :: 3 - Alpha",

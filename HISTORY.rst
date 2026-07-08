@@ -27,6 +27,8 @@ History
 0.2.7 (2025-07-22)
 
 0.2.8 (2025-08-03)
+
+0.3.0 (2026-07-08)
 ------------------
 
 * Refactored package structure: split into ``quanestimation.base`` (core) and ``quanestimation.nv`` (NV magnetometer extension).

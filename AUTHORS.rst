@@ -10,11 +10,11 @@ Development Lead
 Major developers
 ------------
 
+* Zhengwei An
+
 * Huaiming Yu 
 
 * Mao Zhang
-
-* Zhengwei An
 
 Contributors
 ------------

@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "BSD 3-Clause License" }
 authors = [
-    { name = "QuanEstimation Group (Jing Liu et al.)", email = "liujing@hainanu.edu.cn" }
+    { name = "QuanEstimation Group (Jing Liu et al.)", email = "jing.liu@hainanu.edu.cn" }
 ]
 keywords = ["quanestimation"]
 classifiers = [
