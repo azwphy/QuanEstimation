@@ -2,6 +2,25 @@ This part is the classes of the Python-Julia package which written in Python.
 
 ## **Dynamics**
 ::: quanestimation.Lindblad
+::: quanestimation.Kraus
+::: quanestimation.QubitDephasing
+
+## **Control Waveforms**
+
+Predefined control coefficient functions for constructing controlled Hamiltonians.
+Each returns a callable object that evaluates the waveform at time `t`.
+
+::: quanestimation.ZeroCTRL
+::: quanestimation.LinearCTRL
+::: quanestimation.SineCTRL
+::: quanestimation.SawCTRL
+::: quanestimation.TriangleCTRL
+::: quanestimation.GaussianCTRL
+::: quanestimation.GaussianEdgeCTRL
+
+## **NV Magnetometer**
+
+::: quanestimation.NVMagnetometerScheme
 
 ## **Control Optimization**
 The Hamiltonian of a controlled system can be written as
@@ -54,9 +73,6 @@ optimization (PSO), differential evolution (DE), deep deterministic policy gradi
 
 ### **State Optimization DE**
 ::: quanestimation.DE_Sopt
-<!-- 
-### **State Optimization with DDPG**
-::: quanestimation.DDPG_Sopt -->
 
 ---
 

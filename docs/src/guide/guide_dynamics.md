@@ -13,8 +13,10 @@ and $\gamma_i$ are the $i\mathrm{th}$ decay operator and the corresponding decay
 Numerically, the evolved state at $j$th time interval is obtained by $\rho_j=e^{\Delta t\mathcal{L}}
 \rho_{j-1}$ with $\Delta t$ the time interval. The derivatives of $\rho_j$ on $\textbf{x}$ 
 is calculated via
-<center> $\partial_{\textbf{x}}\rho_j =\Delta t(\partial_{\textbf{x}}\mathcal{L})\rho_j
-+e^{\Delta t \mathcal{L}}(\partial_{\textbf{x}}\rho_{j-1}),$ </center> <br>
+$$
+\partial_{\textbf{x}}\rho_j =\Delta t(\partial_{\textbf{x}}\mathcal{L})\rho_j
++e^{\Delta t \mathcal{L}}(\partial_{\textbf{x}}\rho_{j-1}),
+$$
 where $\rho_{j-1}$ is the evolved density matrix at $(j-1)$th time interval.
 
 The dynamics can also be solved by the ordinary differential equation (ODE) solvers, thus 
@@ -26,7 +28,7 @@ Here, $\partial_{\textbf{x}}\rho$ satisfies
 \end{align}
 
 The evolved density matrix $\rho$ and its derivatives ($\partial_{\textbf{x}}\rho$) with 
-respect to $\textbf{x}$ can be calculata the codes
+respect to $\textbf{x}$ can be calculated by
 === "Python"
     ``` py
     dynamics = Lindblad(tspan, rho0, H0, dH, decay=[], Hc=[], ctrl=[])
@@ -126,7 +128,7 @@ eigenstate of $\sigma_3$ with respect to the eigenvalue $1$ $(-1)$.
     # free Hamiltonian
     omega = 1.0
     sz = [1. 0.0im; 0. -1.]
-	H0 = 0.5*omega*sz
+    H0 = 0.5*omega*sz
     # derivative of the free Hamiltonian on omega
     dH = [0.5*sz]
     # time length for the evolution
@@ -219,4 +221,6 @@ eigenvalue $1$ $(-1)$.
     Kraus = QuanEstimation.Kraus(rho0, K, dK)
     rho, drho = QuanEstimation.evolve(Kraus)
     ```
+
+**See also**: [Quantum metrological tools](guide_bounds.md) — use the evolved density matrix and its derivatives to compute Fisher information and Cramér-Rao bounds.
 

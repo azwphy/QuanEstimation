@@ -11,8 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      QuanEstimation_COMPILE: "n"
-      PYTHON_JULIACALL_COMPILE: "no"
+      PYTHON_JULIACALL_HANDLE_SIGNALS: "yes"
 
     steps:
     - uses: actions/checkout@v4
@@ -22,26 +21,21 @@ jobs:
       with:
         python-version: '3.13'
 
-    - name: Cache Julia packages
-      uses: actions/cache@v4
-      env:
-        cache-name: cache-julia-packages
-      with:
-        path: ~/.julia
-        key: ${{ runner.os }}-julia-${{ hashFiles('**/Project.toml') }}
-        restore-keys: |
-          ${{ runner.os }}-julia-
-
     - uses: julia-actions/setup-julia@v2
       with:
-        version: '1.11' 
+        version: '1.12'
 
-    - name: Install Julia dependencies
+    - name: Patch OpenSSL version check
       run: |
-        julia -e 'using Pkg;
-                  Pkg.add(name="QuanEstimation", version="0.2.2");
-                  Pkg.add("PyCall");
-                  Pkg.precompile()'
+        SITEDIR=$(python -c 'import site; print(site.getsitepackages()[0])')
+        cat > "$SITEDIR/sitecustomize.py" << 'PYEOF'
+        import ssl
+        import struct
+        # juliapkg restricts Julia to <=1.11 when OpenSSL < 3.5
+        if ssl.OPENSSL_VERSION_INFO[:2] < (3, 5):
+            ssl.OPENSSL_VERSION_INFO = (3, 5, 0, 0, 0)
+        PYEOF
+        python -c 'import ssl; print("OpenSSL version for juliapkg:", ssl.OPENSSL_VERSION_INFO)'
 
     - name: Install dependencies
       run: |
@@ -50,8 +44,6 @@ jobs:
 
     - name: Run tests 
       run: |
-        export PYTHON_JULIACALL_COMPILE="no"
-        export QuanEstimation_COMPILE="n"
         coverage run --source=quanestimation -m pytest -s --junitxml=test-results.xml 
         coverage xml
 

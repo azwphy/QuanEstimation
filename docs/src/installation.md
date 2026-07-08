@@ -16,7 +16,7 @@ Run the command in the terminal to install QuanEstimation:
     Pkg.add("QuanEstimation")
     ```
     If the users want to install the package via a Julia mirror, please 
-    click [here](https://mirror.tuna.tsinghua.edu.cn/help/julia/) for usage.
+    click [here](https://help.mirrors.cernet.edu.cn/julia/) for usage.
 
 ---
 
@@ -30,7 +30,9 @@ of Python and Julia should be above 3.10 and 1.10, respectively.
 | sympy                        | >=1.10       |
 | scipy                        | >=1.8        |
 | cvxpy                        | >=1.2        |
+| juliacall                    | >=0.9.26     |
 | more-itertools               | >=8.12.0     |
+| h5py                         | >=3.6        |
 
 ## **Julia packages**
 | $~~~~~~~~~~~~~~~~$Package$~~~~~~~~~~~~$| Version     |$~~~~~~~~~~~~~~~~$Package$~~~~~~~~~~~~$| Version     |
@@ -50,3 +52,7 @@ The version information of the packages without the version number is the same w
 corresponding packages in Julia 1.10. Besides, the version information of the full Julia package 
 is also the same as the table above. All of these packages will be automatically installed when
 the users install QuanEstimation.
+
+## **Next steps**
+
+[Getting started](guide/guide_import.md) — import QuanEstimation and understand the Python-Julia bridge.

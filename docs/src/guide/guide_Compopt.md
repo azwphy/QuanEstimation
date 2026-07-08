@@ -37,7 +37,7 @@ and automatic differentiation (AD) [[3]](#Baydin2018).
     corresponding to the optimization algorithm which will be introduced in detail below.
 
     If the dynamics of the system can be described by the master equation, then the dynamics data 
-    `tspan`, `H0`, and `dH` shoule be input. `tspan` is the time length for the evolution, `H0`
+    `tspan`, `H0`, and `dH` should be input. `tspan` is the time length for the evolution, `H0`
     and `dH` are the free Hamiltonian and its derivatives on the unknown parameters to be 
     estimated. `H0` is a matrix when the free Hamiltonian is time-independent and a list of matrices with the 
     length equal to `tspan` when it is time-dependent. `dH` should be input as
@@ -138,7 +138,7 @@ and automatic differentiation (AD) [[3]](#Baydin2018).
     and `LDtype=:LLD`. For the other three scenarios, the objective function is `CFIM_obj()`.
     
     If the dynamics of the system can be described by the master equation, then the dynamics data 
-    `tspan`, `H0`, and `dH` shoule be input. `tspan` is the time length for the evolution, `H0`
+    `tspan`, `H0`, and `dH` should be input. `tspan` is the time length for the evolution, `H0`
     and `dH` are the free Hamiltonian and its derivatives on the unknown parameters to be 
     estimated. `H0` is a matrix when the free Hamiltonian is time-independent and a list of matrices with the 
     length equal to `tspan` when it is time-dependent. `dH` should be input as
@@ -215,7 +215,7 @@ The code for comprehensive optimization with PSO is as follows
 
     `ini_particle`is a tuple contains `psi0`, `ctrl0`, and `measurement0`, which 
     representing the initial guesses of states, control coefficients, and measurements,
-    respectively. The input rule of `ini_particle` shoule be `ini_particle=(psi0, 
+    respectively. The input rule of `ini_particle` should be `ini_particle=(psi0, 
     measurement0)`(SM), `ini_particle=(psi0, ctrl0)`(SC), `ini_particle=(ctrl0, 
     measurement0)`(CM) and  `ini_particle=(psi0, ctrl0, measurement0)`(SCM).
     Here `p_num` is the number of particles, `c0`, `c1`, and `c2` are the PSO parameters 
@@ -274,7 +274,7 @@ The code for comprehensive optimization with DE is as follows
     represents the number of populations. `c` and `cr` are constants for mutation 
     and crossover. `ini_particle`is a tuple contains `psi0`, `ctrl0`, and `measurement0`,
     which representing the initial guesses of states, control coefficients, and 
-    measurements, respectively. The input rule of `ini_particle` shoule be 
+    measurements, respectively. The input rule of `ini_particle` should be 
     `ini_particle=(psi0, measurement0)`(SM), `ini_particle=(psi0, ctrl0)`(SC), 
     `ini_particle=(ctrl0, measurement0)`(CM), and  
     `ini_particle=(psi0, ctrl0, measurement0)`(SCM).
@@ -357,8 +357,8 @@ In this case, we consider two types of comprehensive optimization, the first one
     # free Hamiltonian
     omega = 1.0
     sx = np.array([[0., 1.], [1., 0.]])
-	sy = np.array([[0., -1.j], [1.j, 0.]]) 
-	sz = np.array([[1., 0.], [0., -1.]])
+    sy = np.array([[0., -1.j], [1.j, 0.]]) 
+    sz = np.array([[1., 0.], [0., -1.]])
     H0 = 0.5*omega*sz
     # derivative of the free Hamiltonian on omega
     dH = [0.5*sz]
@@ -366,11 +366,11 @@ In this case, we consider two types of comprehensive optimization, the first one
     Hc = [sx,sy,sz]
     # dissipation
     sp = np.array([[0., 1.], [0., 0.]])  
-	sm = np.array([[0., 0.], [1., 0.]]) 
-	decay = [[sp, 0.], [sm, 0.1]]
+    sm = np.array([[0., 0.], [1., 0.]]) 
+    decay = [[sp, 0.], [sm, 0.1]]
     # measurement
     M1 = 0.5*np.array([[1., 1.], [1., 1.]])
-	M2 = 0.5*np.array([[1., -1.], [-1., 1.]])
+    M2 = 0.5*np.array([[1., -1.], [-1., 1.]])
     M = [M1, M2]
     M_num = 2
     # time length for the evolution
@@ -533,8 +533,8 @@ In this case, we consider two types of comprehensive optimization, the first one
     # free Hamiltonian
     omega = 1.0
     sx = [0. 1.; 1. 0.0im]
-	sy = [0. -im; im 0.]
-	sz = [1. 0.0im; 0. -1.]
+    sy = [0. -im; im 0.]
+    sz = [1. 0.0im; 0. -1.]
     H0 = 0.5*omega*sz
     # derivative of the free Hamiltonian on omega
     dH = [0.5*sz]
@@ -542,11 +542,11 @@ In this case, we consider two types of comprehensive optimization, the first one
     Hc = [sx, sy, sz]
     # dissipation
     sp = [0. 1.; 0. 0.0im]
-	sm = [0. 0.; 1. 0.0im]
+    sm = [0. 0.; 1. 0.0im]
     decay = [[sp, 0.0], [sm, 0.1]]
     # measurement
     M1 = 0.5*[1.0+0.0im  1.; 1.  1.]
-	M2 = 0.5*[1.0+0.0im -1.; -1.  1.]
+    M2 = 0.5*[1.0+0.0im -1.; -1.  1.]
     M = [M1, M2]
     M_num = 2
     # time length for the evolution
@@ -789,27 +789,27 @@ the eigenstate of $\sigma_3$ with respect to the eigenvalue 1. $W$ is set to be 
     rho0[0][0], rho0[0][4], rho0[4][0], rho0[4][4] = 0.5, 0.5, 0.5, 0.5
     # free Hamiltonian
     sx = np.array([[0., 1.],[1., 0.]])
-	sy = np.array([[0., -1.j],[1.j, 0.]]) 
-	sz = np.array([[1., 0.],[0., -1.]])
-	ide2 = np.array([[1., 0.],[0., 1.]])
-	s1 = np.array([[0., 1., 0.],[1., 0., 1.],[0., 1., 0.]])/np.sqrt(2)
-	s2 = np.array([[0., -1.j, 0.],[1.j, 0., -1.j],[0., 1.j, 0.]])/np.sqrt(2)
-	s3 = np.array([[1., 0., 0.],[0., 0., 0.],[0., 0., -1.]])
-	ide3 = np.array([[1., 0., 0.],[0., 1., 0.],[0., 0., 1.]])
-	I1, I2, I3 = np.kron(ide3, sx), np.kron(ide3, sy), np.kron(ide3, sz)
-	S1, S2, S3 = np.kron(s1, ide2), np.kron(s2, ide2), np.kron(s3, ide2)
-	B1, B2, B3 = 5.0e-4, 5.0e-4, 5.0e-4
+    sy = np.array([[0., -1.j],[1.j, 0.]]) 
+    sz = np.array([[1., 0.],[0., -1.]])
+    ide2 = np.array([[1., 0.],[0., 1.]])
+    s1 = np.array([[0., 1., 0.],[1., 0., 1.],[0., 1., 0.]])/np.sqrt(2)
+    s2 = np.array([[0., -1.j, 0.],[1.j, 0., -1.j],[0., 1.j, 0.]])/np.sqrt(2)
+    s3 = np.array([[1., 0., 0.],[0., 0., 0.],[0., 0., -1.]])
+    ide3 = np.array([[1., 0., 0.],[0., 1., 0.],[0., 0., 1.]])
+    I1, I2, I3 = np.kron(ide3, sx), np.kron(ide3, sy), np.kron(ide3, sz)
+    S1, S2, S3 = np.kron(s1, ide2), np.kron(s2, ide2), np.kron(s3, ide2)
+    B1, B2, B3 = 5.0e-4, 5.0e-4, 5.0e-4
     # All numbers are divided by 100 in this example 
-    # for better calculation accurancy
+    # for better calculation accuracy
     cons = 100
-	D = (2*np.pi*2.87*1000)/cons
-	gS = (2*np.pi*28.03*1000)/cons
-	gI = (2*np.pi*4.32)/cons
-	A1 = (2*np.pi*3.65)/cons
-	A2 = (2*np.pi*3.03)/cons
-	H0 = D*np.kron(np.dot(s3, s3), ide2) + gS*(B1*S1+B2*S2+B3*S3) \
-		 + gI*(B1*I1+B2*I2+B3*I3) + A1*(np.kron(s1, sx) + np.kron(s2, sy)) \
-		 + A2*np.kron(s3, sz)
+    D = (2*np.pi*2.87*1000)/cons
+    gS = (2*np.pi*28.03*1000)/cons
+    gI = (2*np.pi*4.32)/cons
+    A1 = (2*np.pi*3.65)/cons
+    A2 = (2*np.pi*3.03)/cons
+    H0 = D*np.kron(np.dot(s3, s3), ide2) + gS*(B1*S1+B2*S2+B3*S3) \
+         + gI*(B1*I1+B2*I2+B3*I3) + A1*(np.kron(s1, sx) + np.kron(s2, sy)) \
+         + A2*np.kron(s3, sz)
     # derivatives of the free Hamiltonian on B1, B2, and B3
     dH = [gS*S1+gI*I1, gS*S2+gI*I2, gS*S3+gI*I3]
     # control Hamiltonians 
@@ -1000,24 +1000,24 @@ the eigenstate of $\sigma_3$ with respect to the eigenvalue 1. $W$ is set to be 
     rho0[1:4:5, 1:4:5] .= 0.5
     # free Hamiltonian
     sx = [0. 1.; 1. 0.]
-	sy = [0. -im; im 0.]
-	sz = [1. 0.; 0. -1.]
-	s1 = [0. 1. 0.; 1. 0. 1.; 0. 1. 0.]/sqrt(2)
-	s2 = [0. -im 0.; im 0. -im; 0. im 0.]/sqrt(2)
-	s3 = [1. 0. 0.; 0. 0. 0.; 0. 0. -1.]
-	Is = I1, I2, I3 = [kron(I(3), sx), kron(I(3), sy), kron(I(3), sz)]
-	S = S1, S2, S3 = [kron(s1, I(2)), kron(s2, I(2)), kron(s3, I(2))]
-	B = B1, B2, B3 = [5.0e-4, 5.0e-4, 5.0e-4]
+    sy = [0. -im; im 0.]
+    sz = [1. 0.; 0. -1.]
+    s1 = [0. 1. 0.; 1. 0. 1.; 0. 1. 0.]/sqrt(2)
+    s2 = [0. -im 0.; im 0. -im; 0. im 0.]/sqrt(2)
+    s3 = [1. 0. 0.; 0. 0. 0.; 0. 0. -1.]
+    Is = I1, I2, I3 = [kron(I(3), sx), kron(I(3), sy), kron(I(3), sz)]
+    S = S1, S2, S3 = [kron(s1, I(2)), kron(s2, I(2)), kron(s3, I(2))]
+    B = B1, B2, B3 = [5.0e-4, 5.0e-4, 5.0e-4]
     # All numbers are divided by 100 in this example 
-    # for better calculation accurancy
+    # for better calculation accuracy
     cons = 100
-	D = (2pi*2.87*1000)/cons
-	gS = (2pi*28.03*1000)/cons
-	gI = (2pi*4.32)/cons
-	A1 = (2pi*3.65)/cons
-	A2 = (2pi*3.03)/cons
-	H0 = sum([D*kron(s3^2, I(2)), sum(gS*B.*S), sum(gI*B.*Is),
-          	  A1*(kron(s1, sx) + kron(s2, sy)), A2*kron(s3, sz)])
+    D = (2pi*2.87*1000)/cons
+    gS = (2pi*28.03*1000)/cons
+    gI = (2pi*4.32)/cons
+    A1 = (2pi*3.65)/cons
+    A2 = (2pi*3.03)/cons
+    H0 = sum([D*kron(s3^2, I(2)), sum(gS*B.*S), sum(gI*B.*Is),
+                A1*(kron(s1, sx) + kron(s2, sy)), A2*kron(s3, sz)])
     # derivatives of the free Hamiltonian on B1, B2 and B3
     dH = gS*S+gI*Is
     # control Hamiltonians 
@@ -1402,3 +1402,5 @@ Optimization over Continuous Spaces,
 A. G. Baydin, B. A. Pearlmutter, A. A. Radul, and J. M. Siskind,
 Automatic differentiation in machine learning: a survey,
 [J. Mach. Learn. Res. **18**, 1-43 (2018).](http://jmlr.org/papers/v18/17-468.html)
+
+**See also**: [Parameterization process](guide_dynamics.md) — construct the system dynamics. [Quantum metrological tools](guide_bounds.md) — the objective functions being optimized. [Output files](output_files.md) — how to load the saved results.

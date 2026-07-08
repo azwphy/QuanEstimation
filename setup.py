@@ -11,27 +11,25 @@ with open("HISTORY.rst") as history_file:
     history = history_file.read()
 
 requirements = [
-    "pip>=19.2.3",
-    "bump2version>=0.5.11",
-    "wheel>=0.33.6",
-    "coverage>=4.5.4",
-    "numpy",
-    "sympy",
-    "scipy",
-    "cvxpy",
-    "juliacall",
-    "more_itertools",
-    "h5py",
+    "numpy>=1.21",
+    "sympy>=1.9",
+    "scipy>=1.7",
+    "cvxpy>=1.2",
+    "juliacall>=0.9.35",
+    "more_itertools>=8.12",
+    "h5py>=3.6",
 ]
 
-test_requirements = []
+test_requirements = [
+    "coverage>=4.5.4",
+]
 
 setup(
     author="Jing Liu et al.",
     author_email="liujing@hainanu.edu.cn ",
     python_requires=">=3.10",
     classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: BSD 3-Clause License",
         "Natural Language :: English",
@@ -42,11 +40,6 @@ setup(
         "Programming Language :: Python :: 3.13",
     ],
     description="A package for quantum parameter estimation.",
-    entry_points={
-        "console_scripts": [
-            "quanestimation=quanestimation.cli:main",
-        ],
-    },
     install_requires=requirements,
     license="BSD 3-Clause License",
     long_description=readme + "\n\n" + history,
@@ -55,9 +48,9 @@ setup(
     keywords="quanestimation",
     name="quanestimation",
     packages=find_packages(include=["quanestimation", "quanestimation.*"]),
-    test_suite="tests",
+    test_suite="test",
     tests_require=test_requirements,
     url="https://github.com/QuanEstimation/QuanEstimation",
-    version="0.2.8",
+    version="0.3.0",
     zip_safe=False,
 )

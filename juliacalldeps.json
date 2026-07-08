@@ -1,11 +1,4 @@
 {
-    "julia": "~1.11.7",
-    "packages": {
-        "QuanEstimation": {
-            "uuid": "088c8dff-a786-4a66-974c-03d3f6773f87",
-            "version": "0.1.6",
-            "url": "https://github.com/QuanEstimation/QuanEstimation.jl",
-            "dev":  true
-        }
-    }
+    "julia": "~1.12",
+    "packages": {}
 }

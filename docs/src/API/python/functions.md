@@ -30,6 +30,11 @@
 ::: quanestimation.QFIM
 ### Quantum Fisher information matrix with Kraus operators
 ::: quanestimation.QFIM_Kraus
+## Quantum Fisher information matrix (pure states)
+::: quanestimation.QFIM_pure
+
+## Williamson form
+::: quanestimation.Williamson_form
 ### Quantum Fisher information matrix in Bloch representation
 ::: quanestimation.QFIM_Bloch
 ### Quantum Fisher information matrix with Gaussian states
@@ -79,6 +84,32 @@
 ::: quanestimation.BayesCost
 ### Bayesian cost bound (BCB)
 ::: quanestimation.BCB
+
+---
+
+## Error evaluation and control
+::: quanestimation.error_evaluation
+::: quanestimation.error_control
+
+---
+
+## State utilities
+
+Convenience constructors for common quantum states and Pauli matrices.
+`sx`, `sy`, `sz` are lowercase aliases of `SigmaX`, `SigmaY`, `SigmaZ`.
+
+::: quanestimation.BellState
+::: quanestimation.PlusState
+::: quanestimation.MinusState
+::: quanestimation.SigmaX
+::: quanestimation.SigmaY
+::: quanestimation.SigmaZ
+::: quanestimation.sx
+::: quanestimation.sy
+::: quanestimation.sz
+
+## Fidelity
+::: quanestimation.fidelity
 
 ---
 

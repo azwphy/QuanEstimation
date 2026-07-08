@@ -138,3 +138,5 @@ QuTiP: An open-source Python framework for the dynamics of open quantum systems,
 J. R. Johansson, P. D. Nation, and F. Nori,
 QuTiP 2: A Python framework for the dynamics of open quantum systems,
 [Comp. Phys. Comm. **184**, 1234 (2013).](https://doi.org/10.1016/j.cpc.2012.11.019)
+
+**See also**: [Parameterization process](guide_dynamics.md) — the density matrix and its derivatives needed as input are obtained from dynamics evolution.

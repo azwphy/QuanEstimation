@@ -149,6 +149,9 @@ dmypy.json
 
 #manifest
 quanestimation/JuliaSrc/Manifest.toml
+quanestimation/JuliaSrc/Project.toml
+quanestimation/JuliaSrc/sys_image/
+quanestimation/JuliaSrc/utils.jl
 
 #history
 .history
@@ -156,3 +159,19 @@ quanestimation/JuliaSrc/Manifest.toml
 #.DS_store
 .DS_store
 */.DS_store
+*.dat
+*.jld2
+*.npy
+f.csv
+deltaphi.csv
+f_list.csv
+controls.csv
+states.csv
+total_reward.csv
+mtspan.csv
+pout.npy
+xout.npy
+Lout.npy
+xout.csv
+y.csv
+pout.csv

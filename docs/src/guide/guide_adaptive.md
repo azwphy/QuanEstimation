@@ -19,7 +19,7 @@ the adaptive estimation can be excuted through
     defaults to $10^{-8}$. At the end of the program, three files "pout.npy", "xout.npy", and "y.npy"  
     including the posterior distributions, the estimated values and the experimental results will be 
     generated. The package contains two mothods for updating the tunable parameters. The first one is 
-    updating the tunable parameters with a fix optimal point (`mtheod="FOP"`), which is the default 
+    updating the tunable parameters with a fix optimal point (`method="FOP"`), which is the default 
     method in QuanEstimation. The other is `method="MI"` which means updating the tunable parameters 
     by maximizing the mutual information which is defined as
     
@@ -44,7 +44,7 @@ the adaptive estimation can be excuted through
     defaults to $10^{-8}$. At the end of the program, three files "pout.csv", "xout.csv", and "y.csv"  
     including the posterior distributions, the estimated values and the experimental results will be 
     generated. The package contains two mothods for updating the tunable parameters. The first one is 
-    updating the tunable parameters with a fix optimal point (`mtheod="FOP"`), which is the default 
+    updating the tunable parameters with a fix optimal point (`method="FOP"`), which is the default 
     method in QuanEstimation. The other is `method="MI"` which means updating the tunable parameters 
     by maximizing the mutual information which is defined as
     
@@ -57,7 +57,7 @@ the adaptive estimation can be excuted through
     will save all the posterior distributions, otherwise, the posterior distribution in the final 
     iteration will be saved. 
 If the dynamics of the system can be described by the master equation, then the dynamics data 
-`tspan`, `H`, and `dH` shoule be input. `tspan` is the time length for the evolution, `H` and 
+`tspan`, `H`, and `dH` should be input. `tspan` is the time length for the evolution, `H` and 
 `dH` are multidimensional lists representing the Hamiltonian and its derivatives with respect to
 the unknown parameters to be estimated, they can be generated via
 === "Python"
@@ -69,7 +69,7 @@ the unknown parameters to be estimated, they can be generated via
     H, dH = BayesInput(x, func, dfunc; channel="dynamics")
     ```
 Here `func` and `dfunc` are the functions defined by the users which return `H` and `dH`, 
-respectively. Futhermore, for the systems with noise and controls, the variables `decay`, 
+respectively. Furthermore, for the systems with noise and controls, the variables `decay`, 
 `Hc` and `ctrl` should be input. Here `Hc` and `ctrl` are two lists representing the control 
 Hamiltonians and the corresponding control coefficients. `decay` contains decay operators 
 $(\Gamma_1, \Gamma_2, \cdots)$ and the corresponding decay rates $(\gamma_1, \gamma_2, \cdots)$
@@ -124,14 +124,14 @@ $\{|\!+\rangle\langle+\!|,|\!-\rangle\langle-\!|\}$. Here $|\pm\rangle:=\frac{1}
     # free Hamiltonian
     B, omega0 = 0.5 * np.pi, 1.0
     sx = np.array([[0., 1.], [1., 0.]])
-	sy = np.array([[0., -1.j], [1.j, 0.]]) 
-	sz = np.array([[1., 0.], [0., -1.]])
+    sy = np.array([[0., -1.j], [1.j, 0.]]) 
+    sz = np.array([[1., 0.], [0., -1.]])
     H0_func = lambda x: 0.5*B*omega0*(sx*np.cos(x[0])+sz*np.sin(x[0]))
     # derivative of free Hamiltonian in x
     dH_func = lambda x: [0.5*B*omega0*(-sx*np.sin(x[0])+sz*np.cos(x[0]))]
     # measurement
     M1 = 0.5*np.array([[1., 1.], [1., 1.]])
-	M2 = 0.5*np.array([[1., -1.], [-1., 1.]])
+    M2 = 0.5*np.array([[1., -1.], [-1., 1.]])
     M = [M1, M2]
     # time length for the evolution
     tspan = np.linspace(0., 1., 1000)
@@ -179,13 +179,13 @@ $\{|\!+\rangle\langle+\!|,|\!-\rangle\langle-\!|\}$. Here $|\pm\rangle:=\frac{1}
 
     B, omega0 = pi/2.0, 1.0
     sx = [0. 1.; 1. 0.0im]
-	sy = [0. -im; im 0.]
-	sz = [1. 0.0im; 0. -1.]
+    sy = [0. -im; im 0.]
+    sz = [1. 0.0im; 0. -1.]
     # initial state
     rho0 = 0.5*ones(2, 2)
     # measurement 
     M1 = 0.5*[1.0+0.0im  1.; 1.  1.]
-	M2 = 0.5*[1.0+0.0im -1.; -1.  1.]
+    M2 = 0.5*[1.0+0.0im -1.; -1.  1.]
     M = [M1, M2]
     # time length for the evolution
     tspan = range(0., stop=1., length=1000) |>Vector
@@ -402,7 +402,7 @@ $m$.
     apt = QuanEstimation.Adapt_MZI(x, p, rho0)
     ```
     === "online"
-        ``` py
+        ``` jl
         QuanEstimation.online(apt, target=:sharpness, output="phi")
         ```
     === "offline"
@@ -441,4 +441,6 @@ Machine Learning for Precise Quantum Measurement,
 A. Hentschel and B. C. Sanders,
 Efficient Algorithm for Optimizing Adaptive Quantum Metrology Processes,
 [Phys. Rev. Lett. **104**, 063603 (2011).](https://doi.org/10.1103/PhysRevLett.107.233601)
+
+**See also**: [Quantum metrological tools](guide_bounds.md) — Bayesian estimation provides the prior distribution for adaptive schemes.
 
