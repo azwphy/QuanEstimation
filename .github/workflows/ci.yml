@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      PYTHON_JULIACALL_COMPILE: "no"
       PYTHON_JULIACALL_HANDLE_SIGNALS: "yes"
 
     steps:
@@ -45,7 +44,6 @@ jobs:
 
     - name: Run tests 
       run: |
-        export PYTHON_JULIACALL_COMPILE="no"
         coverage run --source=quanestimation -m pytest -s --junitxml=test-results.xml 
         coverage xml
 
