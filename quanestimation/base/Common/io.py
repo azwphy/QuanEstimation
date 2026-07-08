@@ -2,15 +2,24 @@ import os
 import h5py
 import numpy as np
 
+
 def _deref(fl, elem):
     """Resolve JLD2 reference or return direct data as-is."""
     if isinstance(elem, np.ndarray):
         return elem
     return np.array(fl[elem])
 
-def load_and_save(filepath, dataset_key, np_save_path, savefile,
-                  item_count=0, max_episode=0, complex_view=False,
-                  nested=True):
+
+def load_and_save(
+    filepath,
+    dataset_key,
+    np_save_path,
+    savefile,
+    item_count=0,
+    max_episode=0,
+    complex_view=False,
+    nested=True,
+):
     """
     Read HDF5 file written by Julia and save as .npy.
 
@@ -36,15 +45,17 @@ def load_and_save(filepath, dataset_key, np_save_path, savefile,
     if not os.path.exists(filepath):
         return
 
-    with h5py.File(filepath, 'r') as fl:
+    with h5py.File(filepath, "r") as fl:
         dset = fl[dataset_key]
 
         if savefile:
             if nested:
-                data = np.array([
-                    [_deref(fl, fl[dset[i]][j]) for j in range(item_count)]
-                    for i in range(len(dset))
-                ])
+                data = np.array(
+                    [
+                        [_deref(fl, fl[dset[i]][j]) for j in range(item_count)]
+                        for i in range(len(dset))
+                    ]
+                )
             else:
                 data = np.array([_deref(fl, dset[i]) for i in range(len(dset))])
         else:
@@ -54,7 +65,7 @@ def load_and_save(filepath, dataset_key, np_save_path, savefile,
                 data = np.array(dset)
 
         if complex_view:
-            data = data.view('complex')
+            data = data.view("complex")
 
     np.save(np_save_path, data)
     os.remove(filepath)

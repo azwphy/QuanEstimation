@@ -25,9 +25,7 @@ class TestNVAnalyticQFIM:
 
         for t in [0.5, 1.0, 2.0, 5.0]:
             tspan = np.linspace(0, t, 2)
-            dynamics = QJL.Lindblad(
-                H0, dH, tspan, dyn_method="Expm"
-            )
+            dynamics = QJL.Lindblad(H0, dH, tspan, dyn_method="Expm")
             scheme = QJL.GeneralScheme(probe=rho0, param=dynamics)
             F_num = QJL.QFIM(scheme)[0, 0]
             F_ana = 4.0 * gS**2 * t**2
@@ -44,6 +42,7 @@ class TestNVMagnetometerScheme:
     @pytest.fixture(autouse=True)
     def _setup(self):
         from quanestimation.nv import NVMagnetometerScheme
+
         self.scheme = NVMagnetometerScheme()
 
     def test_qfim_positive_definite(self):
@@ -85,6 +84,7 @@ class TestNVMagnetometerScheme:
 
     def test_optimize(self):
         from quanestimation.base.ControlOpt.ControlStruct import ControlOpt
+
         F_pre = np.trace(self.scheme.QFIM())
         opt = ControlOpt(
             ctrl0=[np.zeros(200) for _ in range(3)],

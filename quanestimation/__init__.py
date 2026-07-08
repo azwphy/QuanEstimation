@@ -5,4 +5,4 @@ NVMagnetometer (extension) from their respective subpackages.
 """
 
 from quanestimation.base import *  # noqa: F403, F401, E402
-from quanestimation.nv import *    # noqa: F403, F401, E402
+from quanestimation.nv import *  # noqa: F403, F401, E402

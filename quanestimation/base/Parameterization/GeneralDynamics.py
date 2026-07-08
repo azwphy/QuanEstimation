@@ -68,7 +68,7 @@ class Lindblad:
         ctrl : list, optional
             Control coefficients for each control Hamiltonian.
         """
-        
+
         if decay is None:
             decay = []
         if Hc is None:
@@ -142,8 +142,8 @@ class Lindblad:
         $$
             \rho_j = e^{\Delta t \mathcal{L}} \rho_{j-1}
         $$
-        
-        where $\Delta t$ is the time interval and $\rho_{j-1}$ is the density matrix 
+
+        where $\Delta t$ is the time interval and $\rho_{j-1}$ is the density matrix
         at the previous time step.
 
         The derivative $\partial_{\textbf{x}}\rho_j$ is calculated as:
@@ -153,14 +153,14 @@ class Lindblad:
             + e^{\Delta t \mathcal{L}} (\partial_{\textbf{x}}\rho_{j-1})
         $$
 
-        Returns: 
+        Returns:
             (tuple):
-                rho (list): 
+                rho (list):
                     Density matrices at each time point in `tspan`.
 
-                drho (list): 
-                    Derivatives of the density matrices with respect to the unknown parameters.  
-                    `drho[i][j]` is the derivative of the density matrix at the i-th time point 
+                drho (list):
+                    Derivatives of the density matrices with respect to the unknown parameters.
+                    `drho[i][j]` is the derivative of the density matrix at the i-th time point
                     with respect to the j-th parameter.
         """
 
@@ -174,10 +174,10 @@ class Lindblad:
             self.control_Hamiltonian,
             self.control_coefficients,
         )
-        
+
         rho = _unwrap(rho)
         drho = _unwrap(drho)
-        
+
         return rho, drho
 
     def ode(self):
@@ -189,8 +189,8 @@ class Lindblad:
         $$
             \rho_j = e^{\Delta t \mathcal{L}} \rho_{j-1},
         $$
-        
-        where $\Delta t$ is the time interval and $\rho_{j-1}$ is the density matrix 
+
+        where $\Delta t$ is the time interval and $\rho_{j-1}$ is the density matrix
         at the previous time step.
 
         The derivative $\partial_{\textbf{x}}\rho_j$ is calculated as:
@@ -202,12 +202,12 @@ class Lindblad:
 
         Returns:
             (tuple):
-                rho (list): 
+                rho (list):
                     Density matrices at each time point in `tspan`.
 
-                drho (list): 
-                    Derivatives of the density matrices with respect to the unknown parameters.  
-                    `drho[i][j]` is the derivative of the density matrix at the i-th time point 
+                drho (list):
+                    Derivatives of the density matrices with respect to the unknown parameters.
+                    `drho[i][j]` is the derivative of the density matrix at the i-th time point
                     with respect to the j-th parameter.
         """
 
@@ -221,12 +221,12 @@ class Lindblad:
             self.control_Hamiltonian,
             self.control_coefficients,
         )
-        
+
         rho = _unwrap(rho)
         drho = _unwrap(drho)
-        
+
         return rho, drho
-        
+
     def secondorder_derivative(self, d2H):
         r"""
         Calculate the density matrix, its first derivatives, and second derivatives 
@@ -286,7 +286,7 @@ class Lindblad:
         )
         rho = _unwrap(rho)
         drho = _unwrap(drho)
-        
+
         return rho, drho, d2rho
 
 

@@ -35,7 +35,9 @@ def test_dynamics_dH_not_list():
     H0 = np.eye(2, dtype=np.complex128)
     tspan = np.linspace(0, 1, 20)
 
-    with pytest.raises(TypeError, match="The derivative of Hamiltonian should be a list"):
+    with pytest.raises(
+        TypeError, match="The derivative of Hamiltonian should be a list"
+    ):
         sopt.dynamics(tspan, H0, dH=np.eye(2))
 
 
@@ -116,7 +118,9 @@ def test_stateopt_ri_run():
     K1 = np.array([[1.0, 0.0], [0.0, np.sqrt(1 - gamma)]], dtype=np.complex128)
     K2 = np.array([[0.0, np.sqrt(gamma)], [0.0, 0.0]], dtype=np.complex128)
     K = [K1, K2]
-    dK1 = [np.array([[0.0, 0.0], [0.0, -0.5 / np.sqrt(1 - gamma)]], dtype=np.complex128)]
+    dK1 = [
+        np.array([[0.0, 0.0], [0.0, -0.5 / np.sqrt(1 - gamma)]], dtype=np.complex128)
+    ]
     dK2 = [np.array([[0.0, 0.5 / np.sqrt(gamma)], [0.0, 0.0]], dtype=np.complex128)]
     dK = [dK1, dK2]
 
@@ -131,8 +135,10 @@ def test_stateopt_cfim_run():
     sopt = StateOpt(method="AD", max_episode=5, seed=1234)
     H0 = np.array([[1.0, 0], [0, -1.0]], dtype=np.complex128)
     dH = [np.eye(2, dtype=np.complex128)]
-    M = [np.array([[1, 0], [0, 0]], dtype=np.complex128),
-         np.array([[0, 0], [0, 1]], dtype=np.complex128)]
+    M = [
+        np.array([[1, 0], [0, 0]], dtype=np.complex128),
+        np.array([[0, 0], [0, 1]], dtype=np.complex128),
+    ]
     tspan = np.linspace(0, 1, 20)
 
     sopt.dynamics(tspan, H0, dH)

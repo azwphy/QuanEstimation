@@ -3,14 +3,17 @@ __version__ = "0.2.8"
 
 _QJL = None
 
+
 def __getattr__(name):
     if name == "QJL":
         global _QJL
         if _QJL is None:
             from .Common.Common import load_julia
+
             _QJL = load_julia()
         return _QJL
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 from quanestimation.base.AsymptoticBound.CramerRao import (
     CFIM,
@@ -27,7 +30,8 @@ from quanestimation.base.AsymptoticBound.CramerRao import (
     SLD,
 )
 from quanestimation.base.AsymptoticBound.AnalogCramerRao import (
-    HCRB, NHB, 
+    HCRB,
+    NHB,
 )
 from quanestimation.base.BayesianBound.BayesCramerRao import (
     BCFIM,
@@ -41,12 +45,7 @@ from quanestimation.base.BayesianBound.BayesCramerRao import (
 from quanestimation.base.BayesianBound.ZivZakai import (
     QZZB,
 )
-from quanestimation.base.BayesianBound.BayesEstimation import (
-    Bayes,
-    MLE,
-    BCB,
-    BayesCost
-)
+from quanestimation.base.BayesianBound.BayesEstimation import Bayes, MLE, BCB, BayesCost
 
 from quanestimation.base.Common.Common import (
     load_julia,
