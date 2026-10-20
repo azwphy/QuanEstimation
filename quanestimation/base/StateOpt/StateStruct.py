@@ -16,9 +16,9 @@ class StateSystem:
     ----------
     > **savefile:**  `bool`
         -- Whether or not to save all the states.
-        If set `True` then the states and the values of the objective function 
-        obtained in all episodes will be saved during the training. If set `False` 
-        the state in the final episode and the values of the objective function in 
+        If set `True` then the states and the values of the objective function
+        obtained in all episodes will be saved during the training. If set `False`
+        the state in the final episode and the values of the objective function in
         all episodes will be saved.
 
     > **psi0:** `list of arrays`
@@ -73,11 +73,19 @@ class StateSystem:
         Args:
             max_episode (int): Maximum number of episodes.
         """
-        load_and_save("states.dat", "states", "states",
-                       self.savefile, max_episode=max_episode,
-                       nested=False, complex_view=True)
+        load_and_save(
+            "states.dat",
+            "states",
+            "states",
+            self.savefile,
+            max_episode=max_episode,
+            nested=False,
+            complex_view=True,
+        )
 
-    def dynamics(self, tspan, H0, dH, Hc=None, ctrl=None, decay=None, dyn_method="expm"):
+    def dynamics(
+        self, tspan, H0, dH, Hc=None, ctrl=None, decay=None, dyn_method="expm"
+    ):
         r"""
         The dynamics of a density matrix is of the form 
         
@@ -217,7 +225,7 @@ class StateSystem:
                         np.array(x, dtype=np.complex128) for x in Htot
                     ]
                     self.dim = len(self.freeHamiltonian[0])
-                    
+
         QJLType_psi = QJL.Vector[QJL.Vector[QJL.ComplexF64]]
         if self.psi0 == []:
             np.random.seed(self.seed)
@@ -226,11 +234,13 @@ class StateSystem:
             phi = 2 * np.pi * np.random.random(self.dim)
             psi0 = [r[i] * np.exp(1.0j * phi[i]) for i in range(self.dim)]
             self.psi0 = np.array(psi0)
-            self.psi = QJL.convert(QJLType_psi, [self.psi0]) # Initial guesses of states (a list of arrays)
+            self.psi = QJL.convert(
+                QJLType_psi, [self.psi0]
+            )  # Initial guesses of states (a list of arrays)
         else:
             self.psi0 = np.array(self.psi0[0], dtype=np.complex128)
             self.psi = QJL.convert(QJLType_psi, self.psi)
-        
+
         if not isinstance(dH, list):
             raise TypeError("The derivative of Hamiltonian should be a list!")
 
@@ -246,9 +256,13 @@ class StateSystem:
             self.gamma = [decay[i][1] for i in range(len(decay))]
         self.decay_opt = [np.array(x, dtype=np.complex128) for x in decay_opt]
 
-        self.opt = QJL.StateOpt(psi=jlconvert(jl.Vector[jl.ComplexF64], self.psi0), seed=self.seed)
+        self.opt = QJL.StateOpt(
+            psi=jlconvert(jl.Vector[jl.ComplexF64], self.psi0), seed=self.seed
+        )
         if any(self.gamma):
-            decay = [(self.decay_opt[i], self.gamma[i]) for i in range(len(self.decay_opt))]
+            decay = [
+                (self.decay_opt[i], self.gamma[i]) for i in range(len(self.decay_opt))
+            ]
             dynamics = QJL.Lindblad(
                 self.freeHamiltonian,
                 self.Hamiltonian_derivative,
@@ -277,7 +291,7 @@ class StateSystem:
         The parameterization of a state is
         \begin{align}
         \rho=\sum_i K_i\rho_0K_i^{\dagger},
-        \end{align} 
+        \end{align}
 
         where $\rho$ is the evolved density matrix, $K_i$ is the Kraus operator.
 
@@ -287,8 +301,8 @@ class StateSystem:
             -- Kraus operators.
 
         > **dK:** `list`
-            -- Derivatives of the Kraus operators on the unknown parameters to be 
-            estimated. For example, dK[0] is the derivative vector on the first 
+            -- Derivatives of the Kraus operators on the unknown parameters to be
+            estimated. For example, dK[0] is the derivative vector on the first
             parameter.
         """
 
@@ -310,12 +324,14 @@ class StateSystem:
             phi = 2 * np.pi * np.random.random(self.dim)
             psi0 = [r[i] * np.exp(1.0j * phi[i]) for i in range(self.dim)]
             self.psi0 = np.array(psi0)  # Initial state (an array)
-            self.psi = [self.psi0] # Initial guesses of states (a list of arrays)
+            self.psi = [self.psi0]  # Initial guesses of states (a list of arrays)
         else:
             self.psi0 = np.array(self.psi0[0], dtype=np.complex128)
             self.psi = [np.array(psi, dtype=np.complex128) for psi in self.psi]
 
-        self.opt = QJL.StateOpt(psi=jlconvert(jl.Vector[jl.ComplexF64], self.psi0), seed=self.seed)
+        self.opt = QJL.StateOpt(
+            psi=jlconvert(jl.Vector[jl.ComplexF64], self.psi0), seed=self.seed
+        )
         dynamics = QJL.Kraus(self.K, self.dK)
         scheme = QJL.GeneralScheme(probe=self.psi0, param=dynamics)
         self.scheme = scheme
@@ -328,8 +344,8 @@ class StateSystem:
 
     def QFIM(self, W=None, LDtype="SLD"):
         r"""
-        Choose QFI or $\mathrm{Tr}(WF^{-1})$ as the objective function. 
-        In single parameter estimation the objective function is QFI and in 
+        Choose QFI or $\mathrm{Tr}(WF^{-1})$ as the objective function.
+        In single parameter estimation the objective function is QFI and in
         multiparameter estimation it will be $\mathrm{Tr}(WF^{-1})$.
 
         Parameters
@@ -363,16 +379,30 @@ class StateSystem:
                 W = np.eye(self.para_num)
             self.W = W
 
-        self.obj = QJL.QFIM_obj(W=jlconvert(jl.Matrix[jl.Float64], self.W), eps=self.eps, LDtype=jl.Symbol(LDtype))
-        getattr(QJL, "optimize!")(self.scheme, self.opt, algorithm=self.alg, objective=self.obj, savefile=self.savefile)
+        self.obj = QJL.QFIM_obj(
+            W=jlconvert(jl.Matrix[jl.Float64], self.W),
+            eps=self.eps,
+            LDtype=jl.Symbol(LDtype),
+        )
+        getattr(QJL, "optimize!")(
+            self.scheme,
+            self.opt,
+            algorithm=self.alg,
+            objective=self.obj,
+            savefile=self.savefile,
+        )
 
-        max_num = self.max_episode if isinstance(self.max_episode, int) else self.max_episode[0]
+        max_num = (
+            self.max_episode
+            if isinstance(self.max_episode, int)
+            else self.max_episode[0]
+        )
         self.load_save(max_num)
 
     def CFIM(self, M=None, W=None):
         r"""
-        Choose CFI or $\mathrm{Tr}(WI^{-1})$ as the objective function. 
-        In single parameter estimation the objective function is CFI and 
+        Choose CFI or $\mathrm{Tr}(WI^{-1})$ as the objective function.
+        In single parameter estimation the objective function is CFI and
         in multiparameter estimation it will be $\mathrm{Tr}(WI^{-1})$.
 
         Parameters
@@ -381,11 +411,11 @@ class StateSystem:
             -- Weight matrix.
 
         > **M:** `list of matrices`
-            -- A set of positive operator-valued measure (POVM). The default measurement 
+            -- A set of positive operator-valued measure (POVM). The default measurement
             is a set of rank-one symmetric informationally complete POVM (SIC-POVM).
 
-        **Note:** 
-            SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state 
+        **Note:**
+            SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state
             which can be downloaded from [here](http://www.physics.umb.edu/Research/QBism/
             solutions.html).
         """
@@ -408,23 +438,37 @@ class StateSystem:
                 W = np.eye(self.para_num)
             self.W = W
 
-        self.obj = QJL.CFIM_obj(M=jlconvert(jl.Vector[jl.Matrix[jl.ComplexF64]], M), W=jlconvert(jl.Matrix[jl.Float64], self.W), eps=self.eps)
-        getattr(QJL, "optimize!")(self.scheme, self.opt, algorithm=self.alg, objective=self.obj, savefile=self.savefile)
+        self.obj = QJL.CFIM_obj(
+            M=jlconvert(jl.Vector[jl.Matrix[jl.ComplexF64]], M),
+            W=jlconvert(jl.Matrix[jl.Float64], self.W),
+            eps=self.eps,
+        )
+        getattr(QJL, "optimize!")(
+            self.scheme,
+            self.opt,
+            algorithm=self.alg,
+            objective=self.obj,
+            savefile=self.savefile,
+        )
 
-        max_num = self.max_episode if isinstance(self.max_episode, int) else self.max_episode[0]
+        max_num = (
+            self.max_episode
+            if isinstance(self.max_episode, int)
+            else self.max_episode[0]
+        )
         self.load_save(max_num)
 
     def HCRB(self, W=None):
         """
-        Choose HCRB as the objective function. 
+        Choose HCRB as the objective function.
 
-        **Notes:** (1) In single parameter estimation, HCRB is equivalent to QFI, please  
+        **Notes:** (1) In single parameter estimation, HCRB is equivalent to QFI, please
         choose QFI as the objective function. (2) GRAPE and auto-GRAPE are not available
         when the objective function is HCRB. Supported methods are PSO, DE and DDPG.
 
         Parameters
         ----------
-        > **W:** `matrix` 
+        > **W:** `matrix`
             -- Weight matrix.
         """
 
@@ -435,8 +479,9 @@ class StateSystem:
                 W = np.eye(len(self.Hamiltonian_derivative))
             self.W = W
             if len(self.Hamiltonian_derivative) == 1:
-                print("Program terminated. In the single-parameter scenario, the HCRB is equivalent to the QFI. Please choose 'QFIM' as the objective function"
-                    )
+                print(
+                    "Program terminated. In the single-parameter scenario, the HCRB is equivalent to the QFI. Please choose 'QFIM' as the objective function"
+                )
 
         elif self.dynamics_type == "Kraus":
             if W == []:
@@ -447,14 +492,24 @@ class StateSystem:
                     "In single parameter scenario, HCRB is equivalent to QFI. Please choose QFIM as the target function for control optimization",
                 )
         else:
-            raise ValueError(
-                "Supported type of dynamics are Lindblad and Kraus."
-                )
+            raise ValueError("Supported type of dynamics are Lindblad and Kraus.")
 
-        self.obj = QJL.HCRB_obj(W=jlconvert(jl.Matrix[jl.Float64], self.W), eps=self.eps)
-        getattr(QJL, "optimize!")(self.scheme, self.opt, algorithm=self.alg, objective=self.obj, savefile=self.savefile)
+        self.obj = QJL.HCRB_obj(
+            W=jlconvert(jl.Matrix[jl.Float64], self.W), eps=self.eps
+        )
+        getattr(QJL, "optimize!")(
+            self.scheme,
+            self.opt,
+            algorithm=self.alg,
+            objective=self.obj,
+            savefile=self.savefile,
+        )
 
-        max_num = self.max_episode if isinstance(self.max_episode, int) else self.max_episode[0]
+        max_num = (
+            self.max_episode
+            if isinstance(self.max_episode, int)
+            else self.max_episode[0]
+        )
         self.load_save(max_num)
 
 
@@ -490,9 +545,7 @@ def StateOpt(savefile=False, method="AD", **kwargs):
     elif method == "DE":
         return stateoptimize.DE_Sopt(savefile=savefile, **kwargs)
     elif method == "DDPG":
-        raise ValueError(
-            "'DDPG' is currently deprecated and will be fixed soon."    
-            )
+        raise ValueError("'DDPG' is currently deprecated and will be fixed soon.")
         # return stateoptimize.DDPG_Sopt(savefile=savefile, **kwargs)
     elif method == "NM":
         return stateoptimize.NM_Sopt(savefile=savefile, **kwargs)

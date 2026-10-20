@@ -15,16 +15,10 @@ def test_analytic_A_pure_state_qfim() -> None:
         phi = random.random() * 2 * np.pi
         psi = np.array([np.cos(theta), np.sin(theta) * np.exp(1j * phi)])
         rho = np.outer(psi, psi.conj())
-        dtheta_psi = np.array(
-            [-np.sin(theta), np.cos(theta) * np.exp(1j * phi)]
-        )
+        dtheta_psi = np.array([-np.sin(theta), np.cos(theta) * np.exp(1j * phi)])
         dphi_psi = np.array([0.0, 1j * np.sin(theta) * np.exp(1j * phi)])
-        dtheta_rho = np.outer(dtheta_psi, psi.conj()) + np.outer(
-            psi, dtheta_psi.conj()
-        )
-        dphi_rho = np.outer(dphi_psi, psi.conj()) + np.outer(
-            psi, dphi_psi.conj()
-        )
+        dtheta_rho = np.outer(dtheta_psi, psi.conj()) + np.outer(psi, dtheta_psi.conj())
+        dphi_rho = np.outer(dphi_psi, psi.conj()) + np.outer(psi, dphi_psi.conj())
         F = QFIM(rho, [dtheta_rho, dphi_rho], LDtype="SLD")
         F_expected = np.array([[4.0, 0.0], [0.0, np.sin(2 * theta) ** 2]])
         assert np.allclose(F, F_expected, atol=1e-10)
@@ -47,8 +41,7 @@ def test_analytic_B_mixed_state_qfim() -> None:
         det_rho = np.linalg.det(rho)
         for da, db, i, j in pairs:
             F_exact[i, j] = np.real(
-                np.trace(da @ db)
-                + np.trace(rho @ da @ rho @ db) / det_rho
+                np.trace(da @ db) + np.trace(rho @ da @ rho @ db) / det_rho
             )
         assert np.allclose(F_num, F_exact, atol=1e-8)
 
@@ -96,9 +89,7 @@ def test_analytic_D_dephasing_dual() -> None:
             )
 
             F_num = QFIM(rho, [dB_rho, dg_rho], LDtype="SLD")
-            F_BB_exact = (
-                16 * np.abs(rho01_0) ** 2 * np.exp(-2 * gamma * t) * t**2
-            )
+            F_BB_exact = 16 * np.abs(rho01_0) ** 2 * np.exp(-2 * gamma * t) * t**2
             F_gg_exact = t**2 / (np.exp(2 * gamma * t) - 1)
 
             assert np.allclose(F_num[0, 0], F_BB_exact, atol=1e-8)
@@ -113,9 +104,9 @@ def test_analytic_E_thermal_qfi() -> None:
     for T in [0.5, 1.0, 2.0, 5.0]:
         beta = 1.0 / T
         Z = 2.0 * np.cosh(beta * omega)
-        rho = np.diag(
-            [np.exp(-beta * omega) / Z, np.exp(beta * omega) / Z]
-        ).astype(np.complex128)
+        rho = np.diag([np.exp(-beta * omega) / Z, np.exp(beta * omega) / Z]).astype(
+            np.complex128
+        )
         drho00_dbeta = -omega / (2.0 * np.cosh(beta * omega) ** 2)
         drho11_dbeta = omega / (2.0 * np.cosh(beta * omega) ** 2)
         drho_dbeta = np.diag([drho00_dbeta, drho11_dbeta]).astype(np.complex128)
@@ -144,9 +135,7 @@ def test_analytic_F_pure_sld_explicit() -> None:
     if isinstance(L_code, list):
         L_code = L_code[0]
     L_pure = 2.0 * drho
-    L_explicit = 2.0 * (
-        np.outer(psit, dpsit.conj()) + np.outer(dpsit, psit.conj())
-    )
+    L_explicit = 2.0 * (np.outer(psit, dpsit.conj()) + np.outer(dpsit, psit.conj()))
 
     assert np.linalg.norm(L_code - L_pure) < 1e-12
     assert np.linalg.norm(L_code - L_explicit) < 1e-12
@@ -171,15 +160,9 @@ def test_analytic_G_reparametrization() -> None:
     gamma_val = 0.1
     t_val = 0.5
     rho01 = 0.5 * np.exp(-1j * omega * t_val - 2 * gamma_val * t_val)
-    rho_t = np.array(
-        [[0.5, rho01], [np.conj(rho01), 0.5]], dtype=np.complex128
-    )
-    dw_rho01 = -1j * t_val * 0.5 * np.exp(
-        -1j * omega * t_val - 2 * gamma_val * t_val
-    )
-    dw_rho = np.array(
-        [[0.0, dw_rho01], [np.conj(dw_rho01), 0.0]], dtype=np.complex128
-    )
+    rho_t = np.array([[0.5, rho01], [np.conj(rho01), 0.5]], dtype=np.complex128)
+    dw_rho01 = -1j * t_val * 0.5 * np.exp(-1j * omega * t_val - 2 * gamma_val * t_val)
+    dw_rho = np.array([[0.0, dw_rho01], [np.conj(dw_rho01), 0.0]], dtype=np.complex128)
     F_omega = QFIM(rho_t, [dw_rho], LDtype="SLD")
     deta_rho = dw_rho / 2.0
     F_eta = QFIM(rho_t, [deta_rho], LDtype="SLD")
@@ -193,12 +176,16 @@ def test_analytic_G_direct_sum() -> None:
         rho2 = rand_rho(3)
         drho2 = rand_drho(3)
         rho_ds = np.block(
-            [[rho1, np.zeros((2, 3), dtype=np.complex128)],
-             [np.zeros((3, 2), dtype=np.complex128), rho2]]
+            [
+                [rho1, np.zeros((2, 3), dtype=np.complex128)],
+                [np.zeros((3, 2), dtype=np.complex128), rho2],
+            ]
         )
         drho_ds = np.block(
-            [[drho1, np.zeros((2, 3), dtype=np.complex128)],
-             [np.zeros((3, 2), dtype=np.complex128), drho2]]
+            [
+                [drho1, np.zeros((2, 3), dtype=np.complex128)],
+                [np.zeros((3, 2), dtype=np.complex128), drho2],
+            ]
         )
         F1 = QFIM(rho1, [drho1], LDtype="SLD")
         F2 = QFIM(rho2, [drho2], LDtype="SLD")
@@ -216,9 +203,9 @@ def test_analytic_G_convexity() -> None:
         rho_mix = lam * rho1 + (1 - lam) * rho2
         drho_mix = lam * drho1 + (1 - lam) * drho2
         F_mix = QFIM(rho_mix, [drho_mix], LDtype="SLD")
-        F_bound = lam * QFIM(rho1, [drho1], LDtype="SLD") + (
-            1 - lam
-        ) * QFIM(rho2, [drho2], LDtype="SLD")
+        F_bound = lam * QFIM(rho1, [drho1], LDtype="SLD") + (1 - lam) * QFIM(
+            rho2, [drho2], LDtype="SLD"
+        )
         assert F_mix <= F_bound + 1e-8
 
 

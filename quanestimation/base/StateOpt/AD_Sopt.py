@@ -7,10 +7,10 @@ class AD_Sopt(State.StateSystem):
     Attributes
     ----------
     > **savefile:** `bool`
-        -- Whether or not to save all the states.  
-        If set `True` then the states and the values of the objective function 
-        obtained in all episodes will be saved during the training. If set `False` 
-        the state in the final episode and the values of the objective function in 
+        -- Whether or not to save all the states.
+        If set `True` then the states and the values of the objective function
+        obtained in all episodes will be saved during the training. If set `False`
+        the state in the final episode and the values of the objective function in
         all episodes will be saved.
 
     > **Adam:** `bool`
@@ -21,7 +21,7 @@ class AD_Sopt(State.StateSystem):
 
     > **max_episode:** `int`
         -- The number of episodes.
-  
+
     > **epsilon:** `float`
         -- Learning rate.
 
@@ -35,7 +35,7 @@ class AD_Sopt(State.StateSystem):
         -- Machine epsilon.
 
     > **load:** `bool`
-        -- Whether or not to load states in the current location.  
+        -- Whether or not to load states in the current location.
         If set `True` then the program will load state from "states.csv"
         file in the current location and use it as the initial state.
     """
@@ -88,15 +88,21 @@ class AD_Sopt(State.StateSystem):
 
         if self.Adam:
             self.alg = QJL.AD(
-                Adam=True, max_episode=self.max_episode, epsilon=self.epsilon, beta1=self.beta1, beta2=self.beta2,
+                Adam=True,
+                max_episode=self.max_episode,
+                epsilon=self.epsilon,
+                beta1=self.beta1,
+                beta2=self.beta2,
             )
         else:
-            self.alg = QJL.AD(Adam=False, max_episode=self.max_episode, epsilon=self.epsilon)
+            self.alg = QJL.AD(
+                Adam=False, max_episode=self.max_episode, epsilon=self.epsilon
+            )
 
     def QFIM(self, W=None, LDtype="SLD"):
         r"""
-        Choose QFI or $\mathrm{Tr}(WF^{-1})$ as the objective function. 
-        In single parameter estimation the objective function is QFI and in 
+        Choose QFI or $\mathrm{Tr}(WF^{-1})$ as the objective function.
+        In single parameter estimation the objective function is QFI and in
         multiparameter estimation it will be $\mathrm{Tr}(WF^{-1})$.
 
         Parameters
@@ -105,9 +111,9 @@ class AD_Sopt(State.StateSystem):
             -- Weight matrix.
 
         > **LDtype:** `string`
-            -- Types of QFI (QFIM) can be set as the objective function. Options are:  
-            "SLD" (default) -- QFI (QFIM) based on symmetric logarithmic derivative (SLD).  
-            "RLD" -- QFI (QFIM) based on right logarithmic derivative (RLD).  
+            -- Types of QFI (QFIM) can be set as the objective function. Options are:
+            "SLD" (default) -- QFI (QFIM) based on symmetric logarithmic derivative (SLD).
+            "RLD" -- QFI (QFIM) based on right logarithmic derivative (RLD).
             "LLD" -- QFI (QFIM) based on left logarithmic derivative (LLD).
         """
 
@@ -117,8 +123,8 @@ class AD_Sopt(State.StateSystem):
 
     def CFIM(self, M=None, W=None):
         r"""
-        Choose CFI or $\mathrm{Tr}(WI^{-1})$ as the objective function. 
-        In single parameter estimation the objective function is CFI and 
+        Choose CFI or $\mathrm{Tr}(WI^{-1})$ as the objective function.
+        In single parameter estimation the objective function is CFI and
         in multiparameter estimation it will be $\mathrm{Tr}(WI^{-1})$.
 
         Parameters
@@ -127,11 +133,11 @@ class AD_Sopt(State.StateSystem):
             -- Weight matrix.
 
         > **M:** `list of matrices`
-            -- A set of positive operator-valued measure (POVM). The default measurement 
+            -- A set of positive operator-valued measure (POVM). The default measurement
             is a set of rank-one symmetric informationally complete POVM (SIC-POVM).
 
-        **Note:** 
-            SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state 
+        **Note:**
+            SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state
             which can be downloaded from [here](http://www.physics.umb.edu/Research/QBism/
             solutions.html).
         """
@@ -144,7 +150,7 @@ class AD_Sopt(State.StateSystem):
 
     def HCRB(self, W=None):
         """
-        AD is not available when the objective function is HCRB. 
+        AD is not available when the objective function is HCRB.
         Supported methods are PSO, DE, DDPG and NM.
 
         Parameters
@@ -156,4 +162,5 @@ class AD_Sopt(State.StateSystem):
         if W is None:
             W = []
         raise ValueError(
-            "AD is not available when the objective function is HCRB. Supported methods are 'PSO', 'DE', 'NM' and 'DDPG'.")
+            "AD is not available when the objective function is HCRB. Supported methods are 'PSO', 'DE', 'NM' and 'DDPG'."
+        )
