@@ -123,9 +123,7 @@ def test_cm_pso_run():
 
 def test_sc_ad_run():
     """State+Control + AD full pipeline."""
-    copt = ComprehensiveOpt(
-        savefile=False, method="AD", max_episode=5, seed=1234
-    )
+    copt = ComprehensiveOpt(savefile=False, method="AD", max_episode=5, seed=1234)
     H0, dH, _rho0, Hc, tspan = _qubit_setup()
     ctrl = [np.zeros(len(tspan) - 1) for _ in range(len(Hc))]
     copt.dynamics(tspan, H0, dH, Hc=Hc, ctrl=ctrl)

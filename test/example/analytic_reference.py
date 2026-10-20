@@ -93,9 +93,7 @@ def analytic_sysD(t: float, omega1: float, omega2: float, g: float):
     drho1[3, 3] = dbeta * np.conj(beta) + beta * np.conj(dbeta)
     psi = np.array([alpha, 0.0, 0.0, beta], dtype=np.complex128)
     dpsi_w1 = np.array([dalpha, 0.0, 0.0, dbeta], dtype=np.complex128)
-    F11 = 4 * np.real(
-        dpsi_w1.conj() @ dpsi_w1 - np.abs(dpsi_w1.conj() @ psi) ** 2
-    )
+    F11 = 4 * np.real(dpsi_w1.conj() @ dpsi_w1 - np.abs(dpsi_w1.conj() @ psi) ** 2)
     dOmega_dw2 = (omega1 + omega2) / Omega
     dalpha2 = (
         dct
@@ -119,9 +117,7 @@ def analytic_sysD(t: float, omega1: float, omega2: float, g: float):
     drho2[3, 0] = np.conj(drho2[0, 3])
     drho2[3, 3] = dbeta2 * np.conj(beta) + beta * np.conj(dbeta2)
     dpsi_w2 = np.array([dalpha2, 0.0, 0.0, dbeta2], dtype=np.complex128)
-    F22 = 4 * np.real(
-        dpsi_w2.conj() @ dpsi_w2 - np.abs(dpsi_w2.conj() @ psi) ** 2
-    )
+    F22 = 4 * np.real(dpsi_w2.conj() @ dpsi_w2 - np.abs(dpsi_w2.conj() @ psi) ** 2)
     F12 = 4 * np.real(
         dpsi_w1.conj() @ dpsi_w2
         - (dpsi_w1.conj() @ psi) * np.conj(dpsi_w2.conj() @ psi)

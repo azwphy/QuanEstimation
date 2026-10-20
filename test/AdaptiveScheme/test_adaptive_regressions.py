@@ -49,8 +49,12 @@ def test_37_posterior_normalization() -> None:
         np.array([[0.0, 0.0], [0.0, 1.0]], dtype=np.complex128),
     ]
     pout, _ = Bayes(
-        [x_vals], p_vals, rho_list,
-        y=[0] * 500, M=M, savefile=False,
+        [x_vals],
+        p_vals,
+        rho_list,
+        y=[0] * 500,
+        M=M,
+        savefile=False,
     )
     pout_vec = np.asarray(pout).flatten()
     dx = (x_vals[-1] - x_vals[0]) / (len(x_vals) - 1)

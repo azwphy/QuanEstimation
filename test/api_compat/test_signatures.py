@@ -26,11 +26,9 @@ EXPECTED_FUNCTIONS = {
     "QFIM_Bloch": ("r", "dr", "eps"),
     "QFIM_Gauss": ("R", "dR", "D", "dD"),
     "Williamson_form": ("sigma",),
-
     # --- AsymptoticBound/AnalogCramerRao.py ---
     "HCRB": ("rho", "drho", "W", "eps"),
     "NHB": ("rho", "drho", "W"),
-
     # --- BayesianBound/BayesCramerRao.py ---
     "BCFIM": ("x", "p", "rho", "drho", "M", "eps"),
     "BQFIM": ("x", "p", "rho", "drho", "LDtype", "eps"),
@@ -39,20 +37,16 @@ EXPECTED_FUNCTIONS = {
     "VTB": ("x", "p", "dp", "rho", "drho", "M", "eps"),
     "QVTB": ("x", "p", "dp", "rho", "drho", "LDtype", "eps"),
     "OBB": ("x", "p", "dp", "rho", "drho", "d2rho", "LDtype", "eps"),
-
     # --- BayesianBound/ZivZakai.py ---
     "QZZB": ("x", "p", "rho", "eps"),
-
     # --- BayesianBound/BayesEstimation.py ---
     "Bayes": ("x", "p", "rho", "y", "M", "estimator", "savefile"),
     "MLE": ("x", "rho", "y", "M", "savefile"),
     "BayesCost": ("x", "p", "xest", "rho", "M", "W", "eps"),
     "BCB": ("x", "p", "rho", "W", "eps"),
-
     # --- Resource/Resource.py ---
     "SpinSqueezing": ("rho", "basis", "output"),
     "TargetTime": ("f", "tspan", "func", "args", "kwargs"),
-
     # --- Common/Common.py ---
     "SIC": ("dim",),
     "suN_generator": ("n",),
@@ -60,21 +54,26 @@ EXPECTED_FUNCTIONS = {
     "BayesInput": ("x", "func", "dfunc", "channel"),
     "fidelity": ("rho1", "rho2"),
     "error_evaluation": (
-        "scheme", "verbose", "objective",
-        "input_error_scaling", "SLD_eps",
-        "abstol", "reltol",
+        "scheme",
+        "verbose",
+        "objective",
+        "input_error_scaling",
+        "SLD_eps",
+        "abstol",
+        "reltol",
     ),
     "error_control": (
-        "scheme", "objective",
-        "output_error_scaling", "input_error_scaling",
-        "SLD_eps", "max_episode",
+        "scheme",
+        "objective",
+        "output_error_scaling",
+        "input_error_scaling",
+        "SLD_eps",
+        "max_episode",
     ),
-
     # --- Common state constructors ---
     "BellState": ("n",),
     "PlusState": (),
     "MinusState": (),
-
     # --- Parameterization/ControlWaveform.py ---
     "ZeroCTRL": (),
     "LinearCTRL": ("k", "c0"),
@@ -83,32 +82,24 @@ EXPECTED_FUNCTIONS = {
     "TriangleCTRL": ("k", "n"),
     "GaussianCTRL": ("A", "mu", "sigma"),
     "GaussianEdgeCTRL": ("A", "sigma"),
-
     # --- Parameterization/NonDynamics.py ---
     "Kraus": ("rho0", "K", "dK"),
-
     # --- ControlOpt/ControlStruct.py ---
     "ControlOpt": ("savefile", "method", "kwargs"),
     "csv2npy_controls": ("controls", "num"),
-
     # --- StateOpt/StateStruct.py ---
     "StateOpt": ("savefile", "method", "kwargs"),
     "csv2npy_states": ("states", "num"),
-
     # --- MeasurementOpt/MeasurementStruct.py ---
     "MeasurementOpt": ("mtype", "minput", "savefile", "method", "kwargs"),
     "csv2npy_measurements": ("M", "num"),
-
     # --- ComprehensiveOpt/ComprehensiveStruct.py ---
     "ComprehensiveOpt": ("savefile", "method", "kwargs"),
-
     # --- Parameterization/GeneralDynamics.py ---
     "QubitDephasing": ("r", "para_est", "gamma", "tspan"),
     "Lindblad": ("tspan", "rho0", "H0", "dH", "decay", "Hc", "ctrl"),
-
     # --- AdaptiveScheme/Adapt.py ---
     "Adapt": ("x", "p", "rho0", "method", "savefile", "max_episode", "eps"),
-
     # --- AdaptiveScheme/Adapt_MZI.py ---
     "Adapt_MZI": ("x", "p", "rho0"),
 }
@@ -122,12 +113,11 @@ def test_function_signature(name, params):
         pytest.skip(f"{name} not importable from quanestimation *")
     sig = inspect.signature(func)
     actual = tuple(sig.parameters.keys())
-    assert actual == params, (
-        f"{name}: expected params {params}, got {actual}"
-    )
+    assert actual == params, f"{name}: expected params {params}, got {actual}"
 
 
 # ---- Method signatures (on objects returned by factory functions) ------
+
 
 def test_control_opt_methods():
     """Verify ControlOpt-returned object method signatures."""
@@ -135,8 +125,14 @@ def test_control_opt_methods():
 
     sig = inspect.signature(c.dynamics)
     assert tuple(sig.parameters.keys()) == (
-        "tspan", "rho0", "H0", "dH", "Hc", "decay",
-        "ctrl_bound", "dyn_method",
+        "tspan",
+        "rho0",
+        "H0",
+        "dH",
+        "Hc",
+        "decay",
+        "ctrl_bound",
+        "dyn_method",
     ), f"dynamics: {tuple(sig.parameters.keys())}"
 
     sig = inspect.signature(c.QFIM)
@@ -150,7 +146,12 @@ def test_control_opt_methods():
 
     sig = inspect.signature(c.mintime)
     assert tuple(sig.parameters.keys()) == (
-        "f", "W", "M", "method", "target", "LDtype",
+        "f",
+        "W",
+        "M",
+        "method",
+        "target",
+        "LDtype",
     )
 
 
@@ -160,7 +161,13 @@ def test_state_opt_methods():
 
     sig = inspect.signature(s.dynamics)
     assert tuple(sig.parameters.keys()) == (
-        "tspan", "H0", "dH", "Hc", "ctrl", "decay", "dyn_method",
+        "tspan",
+        "H0",
+        "dH",
+        "Hc",
+        "ctrl",
+        "decay",
+        "dyn_method",
     ), f"dynamics: {tuple(sig.parameters.keys())}"
 
     sig = inspect.signature(s.Kraus)
@@ -179,6 +186,7 @@ def test_state_opt_methods():
 def test_lindblad_methods():
     """Verify Lindblad class method signatures."""
     import numpy as np
+
     rho0 = np.eye(2) / 2
     H0 = np.eye(2)
     dH = [np.eye(2)]
@@ -195,11 +203,19 @@ def test_lindblad_methods():
 def test_measurement_opt_methods():
     """Verify MeasurementOpt-returned object method signatures."""
     import numpy as np
+
     m = MeasurementOpt()
 
     sig = inspect.signature(m.dynamics)
     assert tuple(sig.parameters.keys()) == (
-        "tspan", "rho0", "H0", "dH", "Hc", "ctrl", "decay", "dyn_method",
+        "tspan",
+        "rho0",
+        "H0",
+        "dH",
+        "Hc",
+        "ctrl",
+        "decay",
+        "dyn_method",
     ), f"dynamics: {tuple(sig.parameters.keys())}"
 
     sig = inspect.signature(m.Kraus)
@@ -212,12 +228,19 @@ def test_measurement_opt_methods():
 def test_comprehensive_opt_methods():
     """Verify ComprehensiveOpt-returned object method signatures."""
     import numpy as np
+
     com = ComprehensiveOpt()
 
     sig = inspect.signature(com.dynamics)
     assert tuple(sig.parameters.keys()) == (
-        "tspan", "H0", "dH", "Hc", "ctrl", "decay",
-        "ctrl_bound", "dyn_method",
+        "tspan",
+        "H0",
+        "dH",
+        "Hc",
+        "ctrl",
+        "decay",
+        "ctrl_bound",
+        "dyn_method",
     ), f"dynamics: {tuple(sig.parameters.keys())}"
 
     sig = inspect.signature(com.Kraus)
@@ -239,11 +262,18 @@ def test_comprehensive_opt_methods():
 def test_adapt_methods():
     """Verify Adapt class method signatures."""
     import numpy as np
+
     apt = Adapt([0.0, 1.0], [0.5, 0.5], np.eye(2) / 2)
 
     sig = inspect.signature(apt.dynamics)
     assert tuple(sig.parameters.keys()) == (
-        "tspan", "H", "dH", "Hc", "ctrl", "decay", "dyn_method",
+        "tspan",
+        "H",
+        "dH",
+        "Hc",
+        "ctrl",
+        "decay",
+        "dyn_method",
     ), f"dynamics: {tuple(sig.parameters.keys())}"
 
     sig = inspect.signature(apt.Kraus)
@@ -259,6 +289,7 @@ def test_adapt_methods():
 def test_adapt_mzi_methods():
     """Verify Adapt_MZI class method signatures."""
     import numpy as np
+
     apt = Adapt_MZI([0.0], [1.0], np.eye(2) / 2)
 
     sig = inspect.signature(apt.general)
@@ -269,7 +300,16 @@ def test_adapt_mzi_methods():
 
     sig = inspect.signature(apt.offline)
     assert tuple(sig.parameters.keys()) == (
-        "target", "method", "p_num", "deltaphi0",
-        "c", "cr", "c0", "c1", "c2", "seed",
-        "max_episode", "eps",
+        "target",
+        "method",
+        "p_num",
+        "deltaphi0",
+        "c",
+        "cr",
+        "c0",
+        "c1",
+        "c2",
+        "seed",
+        "max_episode",
+        "eps",
     )

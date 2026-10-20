@@ -8,16 +8,18 @@ from quanestimation.base.Common.io import load_and_save
 import quanestimation.base.ControlOpt as ctrl
 from quanestimation.base.Common.Common import SIC
 from quanestimation.base import QJL
+
+
 class ControlSystem:
     """
     Attributes
     ----------
     > **savefile:** `bool`
-        -- Whether or not to save all the control coeffients.  
-        If set `True` then the control coefficients and the values of the 
-        objective function obtained in all episodes will be saved during 
-        the training. If set `False` the control coefficients in the final 
-        episode and the values of the objective function in all episodes 
+        -- Whether or not to save all the control coeffients.
+        If set `True` then the control coefficients and the values of the
+        objective function obtained in all episodes will be saved during
+        the training. If set `False` the control coefficients in the final
+        episode and the values of the objective function in all episodes
         will be saved.
 
     > **ctrl0:** `list of arrays`
@@ -27,9 +29,9 @@ class ControlSystem:
         -- Machine epsilon.
 
     > **load:** `bool`
-        -- Whether or not to load control coefficients in the current location.  
-        If set `True` then the program will load control coefficients from 
-        "controls.csv" file in the current location and use it as the initial 
+        -- Whether or not to load control coefficients in the current location.
+        If set `True` then the program will load control coefficients from
+        "controls.csv" file in the current location and use it as the initial
         control coefficients.
     """
 
@@ -52,9 +54,9 @@ class ControlSystem:
         self.seed = seed
         self.eps = eps
         self.load = load
-        
+
         self.QJLType_ctrl = QJL.Vector[QJL.Vector[QJL.Float64]]
-        
+
     def load_save(self, cnum, max_episode):
         r"""
         Load control coefficients saved by the Julia backend from ``controls.dat``
@@ -68,11 +70,19 @@ class ControlSystem:
             cnum (int): Number of control Hamiltonian channels.
             max_episode (int): Maximum number of episodes.
         """
-        load_and_save("controls.dat", "controls", "controls",
-                       self.savefile, item_count=cnum, max_episode=max_episode,
-                       nested=True)
+        load_and_save(
+            "controls.dat",
+            "controls",
+            "controls",
+            self.savefile,
+            item_count=cnum,
+            max_episode=max_episode,
+            nested=True,
+        )
 
-    def dynamics(self, tspan, rho0, H0, dH, Hc, decay=None, ctrl_bound=None, dyn_method="expm"):
+    def dynamics(
+        self, tspan, rho0, H0, dH, Hc, decay=None, ctrl_bound=None, dyn_method="expm"
+    ):
         r"""
         The dynamics of a density matrix is of the form 
 
@@ -165,7 +175,7 @@ class ControlSystem:
         self.decay_opt = [np.array(x, dtype=np.complex128) for x in decay_opt]
 
         if ctrl_bound == []:
-            self.ctrl_bound =  [float('-inf'), float('inf')]
+            self.ctrl_bound = [float("-inf"), float("inf")]
         else:
             self.ctrl_bound = [float(ctrl_bound[0]), float(ctrl_bound[1])]
         jl = juliacall.Main
@@ -231,13 +241,12 @@ class ControlSystem:
             self.tspan = np.linspace(self.tspan[0], self.tspan[-1], tnum + 1)
             if not isinstance(H0, np.ndarray):
                 H0_inter = f(self.tspan)
-                self.freeHamiltonian = [np.array(x, dtype=np.complex128) for x in H0_inter[:-1]]
+                self.freeHamiltonian = [
+                    np.array(x, dtype=np.complex128) for x in H0_inter[:-1]
+                ]
 
-        
         self.opt = QJL.ControlOpt(
-            ctrl = self.ctrl0,
-            ctrl_bound=self.ctrl_bound, 
-            seed=self.seed
+            ctrl=self.ctrl0, ctrl_bound=self.ctrl_bound, seed=self.seed
         )
         decay = [(self.decay_opt[i], self.gamma[i]) for i in range(len(self.decay_opt))]
         dynamics = QJL.Lindblad(
@@ -246,16 +255,16 @@ class ControlSystem:
             self.tspan,
             self.control_Hamiltonian,
             decay,
-            ctrl = self.control_coefficients,
-            dyn_method = self.dyn_method,
+            ctrl=self.control_coefficients,
+            dyn_method=self.dyn_method,
         )
         self.scheme = QJL.GeneralScheme(probe=self.rho0, param=dynamics)
         self.dynamics_type = "lindblad"
 
     def QFIM(self, W=None, LDtype="SLD"):
         r"""
-        Choose QFI or $\mathrm{Tr}(WF^{-1})$ as the objective function. 
-        In single parameter estimation the objective function is QFI and in 
+        Choose QFI or $\mathrm{Tr}(WF^{-1})$ as the objective function.
+        In single parameter estimation the objective function is QFI and in
         multiparameter estimation it will be $\mathrm{Tr}(WF^{-1})$.
 
         Parameters
@@ -264,10 +273,10 @@ class ControlSystem:
             -- Weight matrix.
 
         > **LDtype:** `string`
-            -- Types of QFI (QFIM) can be set as the objective function. Options are:  
-            "SLD" (default) -- QFI (QFIM) based on symmetric logarithmic derivative (SLD).  
-            "RLD" -- QFI (QFIM) based on right logarithmic derivative (RLD).  
-            "LLD" -- QFI (QFIM) based on left logarithmic derivative (LLD).  
+            -- Types of QFI (QFIM) can be set as the objective function. Options are:
+            "SLD" (default) -- QFI (QFIM) based on symmetric logarithmic derivative (SLD).
+            "RLD" -- QFI (QFIM) based on right logarithmic derivative (RLD).
+            "LLD" -- QFI (QFIM) based on left logarithmic derivative (LLD).
         """
 
         if W is None:
@@ -285,15 +294,29 @@ class ControlSystem:
         self.W = W
 
         jl = juliacall.Main
-        self.obj = QJL.QFIM_obj(W=juliacall.convert(jl.Matrix[jl.Float64], self.W), eps=self.eps, LDtype=jl.Symbol(LDtype))
-        getattr(QJL, "optimize!")(self.scheme, self.opt, algorithm=self.alg, objective=self.obj, savefile=self.savefile)
-        max_num = self.max_episode if isinstance(self.max_episode, int) else self.max_episode[0]
+        self.obj = QJL.QFIM_obj(
+            W=juliacall.convert(jl.Matrix[jl.Float64], self.W),
+            eps=self.eps,
+            LDtype=jl.Symbol(LDtype),
+        )
+        getattr(QJL, "optimize!")(
+            self.scheme,
+            self.opt,
+            algorithm=self.alg,
+            objective=self.obj,
+            savefile=self.savefile,
+        )
+        max_num = (
+            self.max_episode
+            if isinstance(self.max_episode, int)
+            else self.max_episode[0]
+        )
         self.load_save(len(self.control_Hamiltonian), max_num)
 
     def CFIM(self, M=None, W=None):
         r"""
-        Choose CFI or $\mathrm{Tr}(WI^{-1})$ as the objective function. 
-        In single parameter estimation the objective function is CFI and 
+        Choose CFI or $\mathrm{Tr}(WI^{-1})$ as the objective function.
+        In single parameter estimation the objective function is CFI and
         in multiparameter estimation it will be $\mathrm{Tr}(WI^{-1})$.
 
         Parameters
@@ -302,11 +325,11 @@ class ControlSystem:
             -- Weight matrix.
 
         > **M:** `list`
-            -- A set of positive operator-valued measure (POVM). The default measurement 
+            -- A set of positive operator-valued measure (POVM). The default measurement
             is a set of rank-one symmetric informationally complete POVM (SIC-POVM).
 
-        **Note:** 
-            SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state 
+        **Note:**
+            SIC-POVM is calculated by the Weyl-Heisenberg covariant SIC-POVM fiducial state
             which can be downloaded from [here](http://www.physics.umb.edu/Research/QBism/
             solutions.html).
         """
@@ -325,14 +348,28 @@ class ControlSystem:
         self.W = W
 
         jl = juliacall.Main
-        self.obj = QJL.CFIM_obj(M=juliacall.convert(jl.Vector[jl.Matrix[jl.ComplexF64]], M), W=juliacall.convert(jl.Matrix[jl.Float64], self.W), eps=self.eps)
-        getattr(QJL, "optimize!")(self.scheme, self.opt, algorithm=self.alg, objective=self.obj, savefile=self.savefile)
-        max_num = self.max_episode if isinstance(self.max_episode, int) else self.max_episode[0]
+        self.obj = QJL.CFIM_obj(
+            M=juliacall.convert(jl.Vector[jl.Matrix[jl.ComplexF64]], M),
+            W=juliacall.convert(jl.Matrix[jl.Float64], self.W),
+            eps=self.eps,
+        )
+        getattr(QJL, "optimize!")(
+            self.scheme,
+            self.opt,
+            algorithm=self.alg,
+            objective=self.obj,
+            savefile=self.savefile,
+        )
+        max_num = (
+            self.max_episode
+            if isinstance(self.max_episode, int)
+            else self.max_episode[0]
+        )
         self.load_save(len(self.control_Hamiltonian), max_num)
 
     def HCRB(self, W=None):
         """
-        Choose HCRB as the objective function. 
+        Choose HCRB as the objective function.
 
         **Notes:** (1) In single parameter estimation, HCRB is equivalent to QFI, please
         choose QFI as the objective function. (2) GRAPE and auto-GRAPE are not available
@@ -340,7 +377,7 @@ class ControlSystem:
 
         Parameters
         ----------
-        > **W:** `matrix` 
+        > **W:** `matrix`
             -- Weight matrix.
         """
 
@@ -352,17 +389,30 @@ class ControlSystem:
         self.W = W
 
         if len(self.Hamiltonian_derivative) == 1:
-            print("Program terminated. In the single-parameter scenario, HCRB is equivalent to QFI. Please choose QFIM as the objective function."
-                    )
+            print(
+                "Program terminated. In the single-parameter scenario, HCRB is equivalent to QFI. Please choose QFIM as the objective function."
+            )
         else:
             if W == []:
                 W = np.eye(len(self.Hamiltonian_derivative))
-            self.W = W  
+            self.W = W
 
             jl = juliacall.Main
-            self.obj = QJL.HCRB_obj(W=juliacall.convert(jl.Matrix[jl.Float64], self.W), eps=self.eps)
-            getattr(QJL, "optimize!")(self.scheme, self.opt, algorithm=self.alg, objective=self.obj, savefile=self.savefile)
-            max_num = self.max_episode if isinstance(self.max_episode, int) else self.max_episode[0]
+            self.obj = QJL.HCRB_obj(
+                W=juliacall.convert(jl.Matrix[jl.Float64], self.W), eps=self.eps
+            )
+            getattr(QJL, "optimize!")(
+                self.scheme,
+                self.opt,
+                algorithm=self.alg,
+                objective=self.obj,
+                savefile=self.savefile,
+            )
+            max_num = (
+                self.max_episode
+                if isinstance(self.max_episode, int)
+                else self.max_episode[0]
+            )
         self.load_save(len(self.control_Hamiltonian), max_num)
 
     def mintime(self, f, W=None, M=None, method="binary", target="QFIM", LDtype="SLD"):
@@ -378,27 +428,27 @@ class ControlSystem:
             -- Weight matrix.
 
         > **M:** `list of matrices`
-            -- A set of positive operator-valued measure (POVM). The default measurement 
+            -- A set of positive operator-valued measure (POVM). The default measurement
             is a set of rank-one symmetric informationally complete POVM (SIC-POVM).
 
         > **method:** `string`
-            -- Methods for searching the minimum time to reach the given value of the 
-            objective function. Options are:  
-            "binary" (default) -- Binary search (logarithmic search).  
-            "forward" -- Forward search from the beginning of time.  
+            -- Methods for searching the minimum time to reach the given value of the
+            objective function. Options are:
+            "binary" (default) -- Binary search (logarithmic search).
+            "forward" -- Forward search from the beginning of time.
 
         > **target:** `string`
-            -- Objective functions for searching the minimum time to reach the given 
-            value of the objective function. Options are:  
-            "QFIM" (default) -- Choose QFI (QFIM) as the objective function.  
-            "CFIM" -- Choose CFI (CFIM) as the objective function.  
-            "HCRB" -- Choose HCRB as the objective function.  
+            -- Objective functions for searching the minimum time to reach the given
+            value of the objective function. Options are:
+            "QFIM" (default) -- Choose QFI (QFIM) as the objective function.
+            "CFIM" -- Choose CFI (CFIM) as the objective function.
+            "HCRB" -- Choose HCRB as the objective function.
 
         > **LDtype:** `string`
-            -- Types of QFI (QFIM) can be set as the objective function. Options are:  
-            "SLD" (default) -- QFI (QFIM) based on symmetric logarithmic derivative (SLD).  
-            "RLD" -- QFI (QFIM) based on right logarithmic derivative (RLD).  
-            "LLD" -- QFI (QFIM) based on left logarithmic derivative (LLD).  
+            -- Types of QFI (QFIM) can be set as the objective function. Options are:
+            "SLD" (default) -- QFI (QFIM) based on symmetric logarithmic derivative (SLD).
+            "RLD" -- QFI (QFIM) based on right logarithmic derivative (RLD).
+            "LLD" -- QFI (QFIM) based on left logarithmic derivative (LLD).
         """
         jl = juliacall.Main
 
@@ -415,14 +465,12 @@ class ControlSystem:
             )
 
         if self.dynamics_type != "lindblad":
-            raise ValueError(
-                "Supported type of dynamics is Lindblad."
-                )
+            raise ValueError("Supported type of dynamics is Lindblad.")
         if self.savefile == True:
             warnings.warn(
-                    "savefile is set to be False",
-                    DeprecationWarning,
-                )
+                "savefile is set to be False",
+                DeprecationWarning,
+            )
 
         if len(self.Hamiltonian_derivative) > 1:
             f = 1 / f
@@ -433,27 +481,43 @@ class ControlSystem:
 
         if M != []:
             M = [np.array(x, dtype=np.complex128) for x in M]
-            self.obj = QJL.CFIM_obj(M=juliacall.convert(jl.Vector[jl.Matrix[jl.ComplexF64]], M),
-                                     W=juliacall.convert(jl.Matrix[jl.Float64], self.W), eps=self.eps)
+            self.obj = QJL.CFIM_obj(
+                M=juliacall.convert(jl.Vector[jl.Matrix[jl.ComplexF64]], M),
+                W=juliacall.convert(jl.Matrix[jl.Float64], self.W),
+                eps=self.eps,
+            )
         else:
             if target == "HCRB":
                 if self.para_type == "single_para":
                     print(
-                        "Program terminated. In the single-parameter scenario, the HCRB is equivalent to the QFI. Please choose 'QFIM' as the objective function.")
-                self.obj = QJL.HCRB_obj(W=juliacall.convert(jl.Matrix[jl.Float64], self.W), eps=self.eps)
+                        "Program terminated. In the single-parameter scenario, the HCRB is equivalent to the QFI. Please choose 'QFIM' as the objective function."
+                    )
+                self.obj = QJL.HCRB_obj(
+                    W=juliacall.convert(jl.Matrix[jl.Float64], self.W), eps=self.eps
+                )
             elif target == "QFIM" or (
                 LDtype == "SLD" or LDtype == "RLD" or LDtype == "LLD"
             ):
-                self.obj = QJL.QFIM_obj(W=juliacall.convert(jl.Matrix[jl.Float64], self.W),
-                                         eps=self.eps, LDtype=jl.Symbol(LDtype))
+                self.obj = QJL.QFIM_obj(
+                    W=juliacall.convert(jl.Matrix[jl.Float64], self.W),
+                    eps=self.eps,
+                    LDtype=jl.Symbol(LDtype),
+                )
             else:
                 raise ValueError(
                     "Please enter the correct values for target and LDtype. Supported target are 'QFIM', 'CFIM' and 'HCRB', supported LDtype are 'SLD', 'RLD' and 'LLD'."
                 )
 
-        QJL.mintime(method, f, self.scheme, self.opt, algorithm=self.alg, objective=self.obj)
-        max_num = self.max_episode if isinstance(self.max_episode, int) else self.max_episode[0]
+        QJL.mintime(
+            method, f, self.scheme, self.opt, algorithm=self.alg, objective=self.obj
+        )
+        max_num = (
+            self.max_episode
+            if isinstance(self.max_episode, int)
+            else self.max_episode[0]
+        )
         self.load_save(len(self.control_Hamiltonian), max_num)
+
 
 def ControlOpt(savefile=False, method="auto-GRAPE", **kwargs):
     r"""
@@ -486,15 +550,15 @@ def ControlOpt(savefile=False, method="auto-GRAPE", **kwargs):
     elif method == "DE":
         return ctrl.DE_Copt(savefile=savefile, **kwargs)
     elif method == "DDPG":
-        raise ValueError(
-            "'DDPG' is currently deprecated and will be fixed soon."    
-            )
+        raise ValueError("'DDPG' is currently deprecated and will be fixed soon.")
         # return ctrl.DDPG_Copt(savefile=savefile, **kwargs)
     else:
         raise ValueError(
-            "{!r} is not a valid value for method, supported values are 'auto-GRAPE', 'GRAPE', 'PSO', 'DE', 'DDPG'.".format(method
+            "{!r} is not a valid value for method, supported values are 'auto-GRAPE', 'GRAPE', 'PSO', 'DE', 'DDPG'.".format(
+                method
             )
         )
+
 
 def csv2npy_controls(controls, num):
     r"""
