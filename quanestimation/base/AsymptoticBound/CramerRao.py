@@ -14,31 +14,32 @@ from quanestimation.base.AsymptoticBound._julia_qfim import (
 from scipy.integrate import quad
 from scipy.stats import norm, poisson, rayleigh, gamma
 
+
 def FI_Expt(y1, y2, dx, ftype="norm"):
     """
     Calculate the classical Fisher information (CFI) based on experimental data.
 
     Args:
-        y1 (np.array): 
+        y1 (np.array):
             Experimental data obtained at the true parameter value.
-        y2 (np.array): 
+        y2 (np.array):
             Experimental data obtained at parameter value shifted by dx.
-        dx (float): 
+        dx (float):
             Small known parameter shift.
-        ftype (str, optional): 
-            Probability distribution of the data. Options:  
-                - "norm": normal distribution (default).  
-                - "gamma": gamma distribution.  
-                - "rayleigh": Rayleigh distribution.  
-                - "poisson": Poisson distribution.  
+        ftype (str, optional):
+            Probability distribution of the data. Options:
+                - "norm": normal distribution (default).
+                - "gamma": gamma distribution.
+                - "rayleigh": Rayleigh distribution.
+                - "poisson": Poisson distribution.
 
-    Returns: 
-        (float): 
+    Returns:
+        (float):
             Classical Fisher information
 
     Raises:
-        ValueError: 
-            If `ftype` is not one of the supported types ("norm", "poisson", "gamma", "rayleigh").    
+        ValueError:
+            If `ftype` is not one of the supported types ("norm", "poisson", "gamma", "rayleigh").
 
     Notes:
         The current implementation may be unstable and is subject to future modification.
@@ -51,25 +52,25 @@ def FI_Expt(y1, y2, dx, ftype="norm"):
             norm.pdf(x, mu_true, std_true) * norm.pdf(x, mu_shifted, std_shifted)
         )
         fidelity, _ = quad(f_function, -np.inf, np.inf)
-        
+
     elif ftype == "gamma":
         a_true, alpha_true, beta_true = gamma.fit(y1)
         a_shifted, alpha_shifted, beta_shifted = gamma.fit(y2)
         f_function = lambda x: np.sqrt(
-            gamma.pdf(x, a_true, alpha_true, beta_true) *
-            gamma.pdf(x, a_shifted, alpha_shifted, beta_shifted)
+            gamma.pdf(x, a_true, alpha_true, beta_true)
+            * gamma.pdf(x, a_shifted, alpha_shifted, beta_shifted)
         )
-        fidelity, _ = quad(f_function, 0., np.inf)
-        
+        fidelity, _ = quad(f_function, 0.0, np.inf)
+
     elif ftype == "rayleigh":
         mean_true, var_true = rayleigh.fit(y1)
         mean_shifted, var_shifted = rayleigh.fit(y2)
         f_function = lambda x: np.sqrt(
-            rayleigh.pdf(x, mean_true, var_true) *
-            rayleigh.pdf(x, mean_shifted, var_shifted)
+            rayleigh.pdf(x, mean_true, var_true)
+            * rayleigh.pdf(x, mean_shifted, var_shifted)
         )
         fidelity, _ = quad(f_function, -np.inf, np.inf)
-        
+
     elif ftype == "poisson":
         k_max = max(max(y1) + 1, max(y2) + 1)
         k_values = np.arange(k_max)
@@ -78,14 +79,14 @@ def FI_Expt(y1, y2, dx, ftype="norm"):
         p_true /= np.sum(p_true)
         p_shifted /= np.sum(p_shifted)
         fidelity = np.sum(np.sqrt(p_true * p_shifted))
-        
+
     else:
         valid_types = ["norm", "poisson", "gamma", "rayleigh"]
         raise ValueError(
             f"Invalid distribution type: '{ftype}'. "
             f"Supported types are: {', '.join(valid_types)}"
         )
-    
+
     fisher_information = 8 * (1 - fidelity) / dx**2
     return fisher_information
 
@@ -144,63 +145,60 @@ def QFIM_pure(rho, drho):
 
 def QFIM_Kraus(rho0, K, dK, LDtype="SLD", exportLD=False, eps=None):
     r"""
-    Calculation of the quantum Fisher information (QFI) and quantum Fisher 
+    Calculation of the quantum Fisher information (QFI) and quantum Fisher
     information matrix (QFIM) for a quantum channel described by Kraus operators.
 
     The quantum channel is given by
-    
+
     $$
     \rho=\sum_{i} K_i \rho_0 K_i^{\dagger},
     $$
 
     where $\rho_0$ is the initial state and $\{K_i\}$ are the Kraus operators.
 
-    The derivatives of the density matrix $\partial_a\rho$ are calculated from the 
+    The derivatives of the density matrix $\partial_a\rho$ are calculated from the
     derivatives of the Kraus operators $\{\partial_a K_i\}$ as
-    
+
     $$
     \partial_a\rho=\sum_{i}\left[(\partial_a K_i)\rho_0 K_i^{\dagger}+K_i\rho_0(\partial_a K_i)^{\dagger}\right].
     $$
 
-    Then the QFI (QFIM) is calculated via the function `QFIM` with the evolved state 
+    Then the QFI (QFIM) is calculated via the function `QFIM` with the evolved state
     $\rho$ and its derivatives $\{\partial_a\rho\}$.
 
     Args:
-        rho0 (np.array): 
+        rho0 (np.array):
             Initial density matrix.
-        K (list): 
+        K (list):
             Kraus operators.
-        dK (list): 
-            Derivatives of the Kraus operators. It is a nested list where the first index 
-            corresponds to the parameter and the second index corresponds to the Kraus operator index. 
-            For example, `dK[0][1]` is the derivative of the second Kraus operator with respect 
+        dK (list):
+            Derivatives of the Kraus operators. It is a nested list where the first index
+            corresponds to the parameter and the second index corresponds to the Kraus operator index.
+            For example, `dK[0][1]` is the derivative of the second Kraus operator with respect
             to the first parameter.
-        LDtype (str, optional): 
-            Types of QFI (QFIM) can be set as the objective function. Options:  
-                - "SLD" (default): QFI (QFIM) based on symmetric logarithmic derivative.  
-                - "RLD": QFI (QFIM) based on right logarithmic derivative.  
-                - "LLD": QFI (QFIM) based on left logarithmic derivative.  
-        exportLD (bool, optional): 
-            Whether to export the values of logarithmic derivatives.  
-        eps (float, optional): 
+        LDtype (str, optional):
+            Types of QFI (QFIM) can be set as the objective function. Options:
+                - "SLD" (default): QFI (QFIM) based on symmetric logarithmic derivative.
+                - "RLD": QFI (QFIM) based on right logarithmic derivative.
+                - "LLD": QFI (QFIM) based on left logarithmic derivative.
+        exportLD (bool, optional):
+            Whether to export the values of logarithmic derivatives.
+        eps (float, optional):
             Legacy relative spectral floor. When ``None`` the Julia 0.5
             relative precision policy is used.
 
     Returns:
-        (float/np.array): 
-            For single parameter estimation (the length of dK is equal to one), the output is QFI 
+        (float/np.array):
+            For single parameter estimation (the length of dK is equal to one), the output is QFI
             and for multiparameter estimation (the length of dK is more than one), it returns QFIM.
     """
 
     # Transpose dK: from [parameters][operators] to [operators][parameters]
-    dK_transposed = [
-        [dK[i][j] for i in range(len(K))] 
-        for j in range(len(dK[0]))
-    ]
-    
+    dK_transposed = [[dK[i][j] for i in range(len(K))] for j in range(len(dK[0]))]
+
     # Compute the evolved density matrix
     rho = sum(Ki @ rho0 @ Ki.conj().T for Ki in K)
-    
+
     # Compute the derivatives of the density matrix
     drho = [
         sum(
@@ -209,44 +207,44 @@ def QFIM_Kraus(rho0, K, dK, LDtype="SLD", exportLD=False, eps=None):
         )
         for dKj in dK_transposed
     ]
-    
+
     return QFIM(rho, drho, LDtype=LDtype, exportLD=exportLD, eps=eps)
 
 
 def QFIM_Bloch(r, dr, eps=1e-8):
     r"""
-    Calculation of the quantum Fisher information (QFI) and quantum Fisher 
+    Calculation of the quantum Fisher information (QFI) and quantum Fisher
     information matrix (QFIM) in Bloch representation.
 
     The Bloch vector representation of a quantum state is defined as
-    
+
     $$
     \rho = \frac{1}{d}\left(\mathbb{I} + \sum_{i=1}^{d^2-1} r_i \lambda_i\right),
     $$
-    
+
     where $\lambda_i$ are the generators of SU(d) group.
 
     Args:
-        r (np.array): 
+        r (np.array):
             Parameterized Bloch vector.
-        dr (list): 
-            Derivatives of the Bloch vector with respect to the unknown parameters. 
-            Each element in the list is a vector of the same length as `r` and 
-            represents the partial derivative of the Bloch vector with respect to 
-            one parameter. For example, `dr[0]` is the derivative with respect to 
+        dr (list):
+            Derivatives of the Bloch vector with respect to the unknown parameters.
+            Each element in the list is a vector of the same length as `r` and
+            represents the partial derivative of the Bloch vector with respect to
+            one parameter. For example, `dr[0]` is the derivative with respect to
             the first parameter.
-        eps (float, optional): 
-            Machine epsilon.  
+        eps (float, optional):
+            Machine epsilon.
 
     Returns:
-        (float/np.array): 
-            For single parameter estimation (the length of `dr` is equal to one), 
-            the output is QFI and for multiparameter estimation (the length of `dr` 
+        (float/np.array):
+            For single parameter estimation (the length of `dr` is equal to one),
+            the output is QFI and for multiparameter estimation (the length of `dr`
             is more than one), it returns QFIM.
 
     Raises:
-        TypeError: If `dr` is not a list.  
-        ValueError: If the dimension of the Bloch vector is invalid.  
+        TypeError: If `dr` is not a list.
+        ValueError: If the dimension of the Bloch vector is invalid.
     """
 
     if not isinstance(dr, list):
@@ -268,7 +266,7 @@ def QFIM_Bloch(r, dr, eps=1e-8):
     # Handle single-qubit system
     if dim == 2:
         r_norm = np.linalg.norm(r) ** 2
-        
+
         # Pure state case
         if np.abs(r_norm - 1.0) < eps:
             for i in range(num_params):
@@ -296,8 +294,8 @@ def QFIM_Bloch(r, dr, eps=1e-8):
         for i in range(dim**2 - 1):
             for j in range(i, dim**2 - 1):
                 anticommutator = (
-                    lambda_generators[i] @ lambda_generators[j] + 
-                    lambda_generators[j] @ lambda_generators[i]
+                    lambda_generators[i] @ lambda_generators[j]
+                    + lambda_generators[j] @ lambda_generators[i]
                 )
                 G[i, j] = 0.5 * np.trace(rho @ anticommutator)
                 G[j, i] = G[i, j]
@@ -353,41 +351,43 @@ def Williamson_form(sigma):
 
     P = np.hstack([np.eye(2 * n)[:, 0::2], np.eye(2 * n)[:, 1::2]])
     temp1 = J @ sigma_sqrt @ Q
-    temp2 = P @ np.block([[np.zeros((n, n)), -D_inv_sqrt], [D_inv_sqrt, np.zeros((n, n))]])
+    temp2 = P @ np.block(
+        [[np.zeros((n, n)), -D_inv_sqrt], [D_inv_sqrt, np.zeros((n, n))]]
+    )
     S = np.linalg.inv((temp1 @ temp2).T) @ P.T
     return S, c
 
 
 def QFIM_Gauss(R, dR, D, dD):
     r"""
-    Calculation of the quantum Fisher information (QFI) and quantum 
+    Calculation of the quantum Fisher information (QFI) and quantum
     Fisher information matrix (QFIM) for Gaussian states.
 
-    The Gaussian state is characterized by its first-order moment (displacement vector) 
-    and second-order moment (covariance matrix). The QFIM is calculated using the 
+    The Gaussian state is characterized by its first-order moment (displacement vector)
+    and second-order moment (covariance matrix). The QFIM is calculated using the
     method described in [1].
 
     Args:
-        R (np.array): 
+        R (np.array):
             First-order moment (displacement vector).
-        dR (list): 
-            Derivatives of the first-order moment with respect to the unknown parameters. 
-            Each element in the list is a vector of the same length as `R` and represents the partial 
-            derivative of the displacement vector with respect to one parameter. For example, `dR[0]` 
+        dR (list):
+            Derivatives of the first-order moment with respect to the unknown parameters.
+            Each element in the list is a vector of the same length as `R` and represents the partial
+            derivative of the displacement vector with respect to one parameter. For example, `dR[0]`
             is the derivative with respect to the first parameter.
-        D (np.array): 
+        D (np.array):
             Second-order moment (covariance matrix).
-        dD (list): 
-            Derivatives of the second-order moment with respect to the unknown parameters. 
-            Each element in the list is a matrix of the same dimension as `D` and 
-            represents the partial derivative of the covariance matrix with respect to 
-            one parameter. For example, `dD[0]` is the derivative with respect to 
+        dD (list):
+            Derivatives of the second-order moment with respect to the unknown parameters.
+            Each element in the list is a matrix of the same dimension as `D` and
+            represents the partial derivative of the covariance matrix with respect to
+            one parameter. For example, `dD[0]` is the derivative with respect to
             the first parameter.
 
     Returns:
-        (float/np.array): 
-            For single parameter estimation (the length of `dR` is equal to one), 
-            the output is QFI and for multiparameter estimation (the length of `dR` 
+        (float/np.array):
+            For single parameter estimation (the length of `dR` is equal to one),
+            the output is QFI and for multiparameter estimation (the length of `dR`
             is more than one), it returns QFIM.
 
     Notes:
@@ -401,10 +401,7 @@ def QFIM_Gauss(R, dR, D, dD):
 
     # Compute the covariance matrix from the second-order moments and displacement
     cov_matrix = np.array(
-        [
-            [D[i][j] - R[i] * R[j] for j in range(2 * m)]
-            for i in range(2 * m)
-        ]
+        [[D[i][j] - R[i] * R[j] for j in range(2 * m)] for i in range(2 * m)]
     )
 
     # Compute the derivatives of the covariance matrix
@@ -458,7 +455,9 @@ def QFIM_Gauss(R, dR, D, dD):
         g.append(g_k)
 
     # Initialize the matrices G for each parameter
-    G_matrices = [np.zeros((2 * m, 2 * m), dtype=np.complex128) for _ in range(num_params)]
+    G_matrices = [
+        np.zeros((2 * m, 2 * m), dtype=np.complex128) for _ in range(num_params)
+    ]
 
     # Construct the matrices G for each parameter
     for k in range(num_params):
