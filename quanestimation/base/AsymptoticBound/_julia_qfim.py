@@ -22,7 +22,12 @@ def _call(function, *args, **kwargs):
         message = str(exc)
         if any(
             name in message
-            for name in ("ArgumentError", "BoundsError", "DomainError", "DimensionMismatch")
+            for name in (
+                "ArgumentError",
+                "BoundsError",
+                "DomainError",
+                "DimensionMismatch",
+            )
         ):
             raise ValueError(message) from exc
         raise
