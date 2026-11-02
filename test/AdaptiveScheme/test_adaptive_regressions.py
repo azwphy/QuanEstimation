@@ -1,6 +1,6 @@
 """Adaptive scheme regression tests — Julia @testset parity.
 
-来源: test_adaptive_estimation.jl
+Source: test_adaptive_estimation.jl
 """
 
 import numpy as np
@@ -9,7 +9,7 @@ import numpy as np
 def test_12_mi_error_probability() -> None:
     """#12: Conditional probability p(y|x) = tr(ρM) must be in [0,1].
 
-    来源: test_adaptive_estimation.jl @testset "#12"
+    Source: test_adaptive_estimation.jl @testset "#12"
     """
     rho0 = np.array([[1.0, 0.0], [0.0, 0.0]], dtype=np.complex128)
     M1 = np.array([[1.0, 0.0], [0.0, 0.0]], dtype=np.complex128)
@@ -24,7 +24,7 @@ def test_12_mi_error_probability() -> None:
 def test_37_posterior_normalization() -> None:
     """#37: Bayes() posterior integral must equal 1.
 
-    来源: test_adaptive_estimation.jl @testset "#37"
+    Source: test_adaptive_estimation.jl @testset "#37"
     """
     from quanestimation.base.Parameterization.GeneralDynamics import Lindblad
     from quanestimation.base.BayesianBound.BayesEstimation import Bayes
@@ -49,8 +49,12 @@ def test_37_posterior_normalization() -> None:
         np.array([[0.0, 0.0], [0.0, 1.0]], dtype=np.complex128),
     ]
     pout, _ = Bayes(
-        [x_vals], p_vals, rho_list,
-        y=[0] * 500, M=M, savefile=False,
+        [x_vals],
+        p_vals,
+        rho_list,
+        y=[0] * 500,
+        M=M,
+        savefile=False,
     )
     pout_vec = np.asarray(pout).flatten()
     dx = (x_vals[-1] - x_vals[0]) / (len(x_vals) - 1)

@@ -15,13 +15,9 @@ requirements = [
     "sympy>=1.9",
     "scipy>=1.7",
     "cvxpy>=1.2",
-    "juliacall>=0.9.35",
+    "juliacall>=0.9.37",
     "more_itertools>=8.12",
     "h5py>=3.6",
-]
-
-test_requirements = [
-    "coverage>=4.5.4",
 ]
 
 setup(
@@ -31,7 +27,6 @@ setup(
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: BSD 3-Clause License",
         "Natural Language :: English",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.10",
@@ -43,14 +38,12 @@ setup(
     install_requires=requirements,
     license="BSD 3-Clause License",
     long_description=readme + "\n\n" + history,
-    long_description_content_type = "text/markdown", 
+    long_description_content_type="text/markdown",
     include_package_data=True,
     keywords="quanestimation",
     name="quanestimation",
     packages=find_packages(include=["quanestimation", "quanestimation.*"]),
-    test_suite="test",
-    tests_require=test_requirements,
     url="https://github.com/QuanEstimation/QuanEstimation",
-    version="0.4.0",
+    version="0.5.0",
     zip_safe=False,
 )

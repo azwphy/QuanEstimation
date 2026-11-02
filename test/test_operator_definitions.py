@@ -21,9 +21,7 @@ def test_operator_definitions() -> None:
             L_orig = SLD(rho, [drho], rep="original")
             if isinstance(L_orig, list):
                 L_orig = L_orig[0]
-            assert np.allclose(
-                2.0 * drho, L_orig @ rho + rho @ L_orig, atol=1e-10
-            )
+            assert np.allclose(2.0 * drho, L_orig @ rho + rho @ L_orig, atol=1e-10)
 
             # RLD: drho = rho @ R
             R_orig = RLD(rho, [drho], rep="original")
