@@ -14,15 +14,9 @@ def test_low_temperature_thermometry() -> None:
     """
     epsilon, temperature = 1.0, 0.05
     population = 1.0 / (1.0 + np.exp(epsilon / temperature))
-    rho = np.array(
-        [[1.0 - population, 0.0], [0.0, population]], dtype=np.complex128
-    )
-    d_population = (
-        population * (1.0 - population) * epsilon / temperature**2
-    )
-    drho = np.array(
-        [[-d_population, 0.0], [0.0, d_population]], dtype=np.complex128
-    )
+    rho = np.array([[1.0 - population, 0.0], [0.0, population]], dtype=np.complex128)
+    d_population = population * (1.0 - population) * epsilon / temperature**2
+    drho = np.array([[-d_population, 0.0], [0.0, d_population]], dtype=np.complex128)
     measurement = [
         np.array([[1.0, 0.0], [0.0, 0.0]], dtype=np.complex128),
         np.array([[0.0, 0.0], [0.0, 1.0]], dtype=np.complex128),
@@ -30,6 +24,4 @@ def test_low_temperature_thermometry() -> None:
     analytic = population * (1.0 - population) * (epsilon / temperature**2) ** 2
 
     assert np.isclose(QFIM(rho, [drho]), analytic, rtol=1e-12, atol=0.0)
-    assert np.isclose(
-        CFIM(rho, [drho], measurement), analytic, rtol=1e-12, atol=0.0
-    )
+    assert np.isclose(CFIM(rho, [drho], measurement), analytic, rtol=1e-12, atol=0.0)

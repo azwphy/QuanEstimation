@@ -21,7 +21,9 @@ def test_version_metadata() -> None:
     assert quanestimation.__version__ == VERSION
     assert Common.JULIA_PACKAGE_VERSION == VERSION
 
-    assert re.search(r'^version = "%s"$' % re.escape(VERSION), _read("pyproject.toml"), re.M)
+    assert re.search(
+        r'^version = "%s"$' % re.escape(VERSION), _read("pyproject.toml"), re.M
+    )
     assert re.search(r'version="%s"' % re.escape(VERSION), _read("setup.py"))
     assert re.search(r"^version = %s$" % re.escape(VERSION), _read("setup.cfg"), re.M)
 
